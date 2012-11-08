@@ -1,0 +1,45 @@
+commit 1bafd3d1decf0a3b770b55f3d2f1ac5876a5864f
+Author: Torsten Fortsch <torsten@apache.org>
+Date:   Fri May 20 17:22:24 2011 +0000
+
+    adopt the Perl_sv_dup() changes in Perl 5.14
+    
+    git-svn-id: https://svn.apache.org/repos/asf/perl/modperl/trunk@1125476 13f79535-47bb-0310-9956-ffa450edef68
+
+diff --git a/src/modules/perl/modperl_svptr_table.c b/src/modules/perl/modperl_svptr_table.c
+index c05e0ac..0ca5c95 100644
+--- a/src/modules/perl/modperl_svptr_table.c
++++ b/src/modules/perl/modperl_svptr_table.c
+@@ -30,7 +30,7 @@
+ #ifdef USE_ITHREADS
+ 
+ #if MP_PERL_BRANCH(5, 6)
+-#   define my_sv_dup(s, p) sv_dup(s)
++#   define my_sv_dup(s, p) SvREFCNT_inc(sv_dup(s))
+ 
+ typedef struct {
+     AV *stashes;
+@@ -39,7 +39,11 @@ typedef struct {
+ } CLONE_PARAMS;
+ 
+ #else
+-#   define my_sv_dup(s, p) sv_dup(s, p)
++#   ifdef sv_dup_inc
++#       define my_sv_dup(s, p) sv_dup_inc(s, p)
++#   else
++#       define my_sv_dup(s, p) SvREFCNT_inc(sv_dup(s, p))
++#   endif
+ #endif
+ 
+ /*
+@@ -89,8 +93,7 @@ PTR_TBL_t *modperl_svptr_table_clone(pTHX_ PerlInterpreter *proto_perl,
+             /* key is just a pointer we do not modify, no need to copy */
+             dst_ent->oldval = src_ent->oldval;
+ 
+-            dst_ent->newval =
+-                SvREFCNT_inc(my_sv_dup((SV*)src_ent->newval, &parms));
++            dst_ent->newval = my_sv_dup((SV*)src_ent->newval, &parms);
+         }
+     }
+ 
+

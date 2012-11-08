@@ -1,0 +1,8 @@
+DIST libfacet-0.0.1alpha2.tar.bz2 16117 RMD160 9361b7493170741d96cc68f22be7444b8b086a6d SHA1 567e65a368049de1da9a4c4ed882ea4a1c505021 SHA256 dc53351c4035a3c27dc6c1d0410e808346fbc107e7e7c112ec65c59d0df7a144
+EBUILD multitran-libfacet-0.0.1_alpha2.ebuild 617 RMD160 433e0234ca528451a1729427c6a93293075f2c81 SHA1 b4a594bfdf81c32cdb780302891297fe3e379cff SHA256 4f839eb9883dab79f5dbf3f9481738289c8bb9cd0e5def2a7ec1c6e40ef9765a
+MD5 e8def4a378a521b2dca8cd27103b2a45 multitran-libfacet-0.0.1_alpha2.ebuild 617
+RMD160 433e0234ca528451a1729427c6a93293075f2c81 multitran-libfacet-0.0.1_alpha2.ebuild 617
+SHA256 4f839eb9883dab79f5dbf3f9481738289c8bb9cd0e5def2a7ec1c6e40ef9765a multitran-libfacet-0.0.1_alpha2.ebuild 617
+MD5 c5e43a9dbae1064e1795dcef967e4c7a files/digest-multitran-libfacet-0.0.1_alpha2 262
+RMD160 9981ee8eb79569833c951469cfeba3c07067dcd1 files/digest-multitran-libfacet-0.0.1_alpha2 262
+SHA256 4a3993be3f2c97a8b8a581a5e5575f59f12115ab0f890cfe04da6b9aea513498 files/digest-multitran-libfacet-0.0.1_alpha2 262

@@ -1,0 +1,8 @@
+DIST human-cursors-theme_0.4.orig.tar.gz 64050 RMD160 ae4bb3575b6df063daec733a5d84a314c3368d89 SHA1 5813c5e8d56aef8f056c38c85e8303bdedc45e18 SHA256 4728f6971ea1470fab150b6e7e84e9b690946d74ed11cc02154b2eb877942959
+EBUILD human-cursors-theme-0.4.ebuild 445 RMD160 b435f8834a929825a8e3b58cc734aacbb71fe08e SHA1 b5fac8093ca58b3b8b2c638b894c85d91f639068 SHA256 5b5ee96e754bf17bc138aed669af77fe30ee7aed2b87df54963d10ac902fbac4
+MD5 c875b136ae36c2c9391c1b779f9c409a human-cursors-theme-0.4.ebuild 445
+RMD160 b435f8834a929825a8e3b58cc734aacbb71fe08e human-cursors-theme-0.4.ebuild 445
+SHA256 5b5ee96e754bf17bc138aed669af77fe30ee7aed2b87df54963d10ac902fbac4 human-cursors-theme-0.4.ebuild 445
+MD5 bbe2a8fff3a45ae4729b6ac4aa4c93f5 files/digest-human-cursors-theme-0.4 283
+RMD160 461647ca36f46d4747df43175831001ca5e87ec5 files/digest-human-cursors-theme-0.4 283
+SHA256 2fbae425ec5aff51934d0bd6bdeef24cd754ba8ed3b2e0f5fde156d1c82175c8 files/digest-human-cursors-theme-0.4 283

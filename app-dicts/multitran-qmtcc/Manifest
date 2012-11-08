@@ -1,0 +1,8 @@
+DIST qmtcc-0.0.1-alt3.src.rpm 41827 RMD160 eda830779eb8d74606b6c8dd030a591e90690639 SHA1 b786ac683180f8ec4565f231b73e92ce4ba022ef SHA256 5dc2a500e52614ef1bbdcea85a80823760fb90c9c1e31139c1b26876d0655d69
+EBUILD multitran-qmtcc-0.0.1_alpha1.ebuild 1102 RMD160 c5927f621d7af4af9c765806ba56e53f25b79c81 SHA1 489a4ccf4317b99b0ff91335df6f9467a800cfd9 SHA256 3fe5dd6a95173b8010661bd036d8b76a8c60df1e455dcad54c23a333faeb15e2
+MD5 b9ed709abc6309a4b21a9dd4d8402a47 multitran-qmtcc-0.0.1_alpha1.ebuild 1102
+RMD160 c5927f621d7af4af9c765806ba56e53f25b79c81 multitran-qmtcc-0.0.1_alpha1.ebuild 1102
+SHA256 3fe5dd6a95173b8010661bd036d8b76a8c60df1e455dcad54c23a333faeb15e2 multitran-qmtcc-0.0.1_alpha1.ebuild 1102
+MD5 6d83e019e358ddcdedf42aa256ed35e7 files/digest-multitran-qmtcc-0.0.1_alpha1 250
+RMD160 5509bdf8f99254b9bf87eaa6915e2b26d4b8d970 files/digest-multitran-qmtcc-0.0.1_alpha1 250
+SHA256 abe1931a0c666e2dc3b2e9f1d12cb168c6cc34192e3ad9a44390ae084ed5ac7e files/digest-multitran-qmtcc-0.0.1_alpha1 250

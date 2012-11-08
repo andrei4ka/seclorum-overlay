@@ -1,0 +1,9 @@
+# Copyright 2009 Gentoo Foundation.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/profiles/desc/brother_printers.desc,v 1.1 2009/05/17 10:32:48 lu_zero Exp $
+
+# This file contains descriptions of BROTHER_PRINTERS USE_EXPAND flags.
+
+# Keep it sorted.
+
+arm - system emulation target

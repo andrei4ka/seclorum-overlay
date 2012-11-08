@@ -1,0 +1,112 @@
+STEP 1:
+it's recommended to switch "register_globals" to "Off" to increase security
+
+
+STEP 2:
+First of all, it is necessary to modify the ulogd conf file (in mandrake is in /etc/ulogd.conf) to write
+the log on database (MySQL). 
+(For further information go to http://www.netfilter.org/projects/ulogd/downloads.html)
+
+//example of ulogd file
+
+mysqltable ulog
+mysqlpass password
+mysqluser user
+mysqldb iptables
+mysqlhost localhost
+# load the plugin (remove the ' # ' if you want to enable it)
+plugin/usr/lib/ulogd/ulogd_MYSQL.so
+
+
+After this step you must execute ulogd service (in mandrake with "ulogd - d");  if you haven't found any
+problem, you can define the new iptables rules.
+
+//example of iptables rules
+
+/sbin/iptables -I INPUT -p icmp --icmp-type echo-request -j ULOG --ulog-prefix "ICMP DROP"
+/sbin/iptables -I INPUT -m state --state INVALID -j ULOG --ulog-prefix "INVALID"
+/sbin/iptables -I INPUT -p tcp ! --syn -m state --state NEW -j ULOG --ulog-prefix "NEW INCORRECT"
+/sbin/iptables -I INPUT -p tcp --dport 1:1024 -m state --state NEW -j ULOG --ulog-prefix "TCP DROP"
+/sbin/iptables -I INPUT -p udp --dport 1:1024 -m state --state NEW -j ULOG --ulog-prefix "UDP DROP"
+
+The first rule records "echo-request" with the name "ICMP DROP"
+The second rule records invalid packets with the name "INVALID"
+The third rule records "new connections" that don't start with SYN packet with the name "NEW INCORRECT"
+The fourth rule records the TCP connection, from port number 1 to 1024, with the name "TCP DROP"
+The fifth rule records the UDP connection, from port number 1 to 1024, with the name "UDP DROP"
+
+
+
+STEP 3:
+Browse http://${VHOST_HOSTNAME}/${VHOST_APPDIR}/install.php
+
+During the installation you must:
+
+* define the General configuration:
+        Public access: it permits if the web has public access or not
+        Default language: default language of system
+        System url: link of IptablesWeb (can be http or https) 
+	(e.g. http://${VHOST_HOSTNAME}/${VHOST_APPDIR}/my_iptablesweb/)
+        System email: system email of IptablesWeb
+        Absolute path: absolute path of system
+        Crontab password: password to protect system script (used for statistic update)
+        Log saved: Log saved for each user
+
+* define Database configuration:
+        Database: Type of database used
+        Host database: Host address where the database is reachable
+        Database name: Database name
+        Username: Username
+        Password: Password
+        Ulogd table: ulogd table used to save iptables log
+
+* define Session configuration:
+        Garbage collector time (in second): Garbace collector time
+        Session time (in second): Session validity time, in second; if 0, session will last until the
+browser is close
+
+* define Email configuration:
+        Type of SMTP: if you want use internal smtp, use localhost otherwise an external one
+        SMTP server: external SMTP server
+        Authentication: Use this features if you wish to send email with authentication
+        Username: Username of server SMTP authentication
+        Password: Password of server SMTP authentication
+
+Remember that IptablesWeb tables must be in the same database where ulogd tables exists.
+
+Finally you must define the first group and the first admin account. 
+REMEMBER TO "chmod 777 ${VHOST_ROOT}/${PN}/tmp/"
+DELETE ${VHOST_ROOT}/${PN}/install.php.
+
+
+
+STEP 4:
+Now you must define what type of iptables log must be managed; go to Iptables management.
+
+//example of iptables rule
+
+/sbin/iptables -I INPUT -p icmp --icmp-type echo-request -j ULOG --ulog-prefix "ICMP DROP"
+
+In the name field write the string ICMP DROP; in the color field write a SRGB color (e.g. #FF0000 for the
+red); in the name field write a text that will be displayed in the IptablesWeb interfaces.
+
+Then go to System info area and you will be found the link to copy in your event schedulator, like
+crontab.
+
+In crontab you must paste this link
+*/5 * * * * lynx > /dev/null -dump http://${VHOST_HOSTNAME}/${VHOST_APPDIR}//system.php?key_check=cc03e047a6afgbcbk8be7668acfebae5
+
+
+STEP 5:
+First of all you must  download a plugin and then decompress it. Now copy the folder you just extracted
+into the "plugin" folder of your IptablesWeb.
+Go to your administrative area, select plugin management and click on the icon to install it.
+Go to Block management to duplicate the plugin.
+
+Remember, a block can be created if:
+        A plugin is selected
+        An Iptables rule is selected
+        A group is selected or/and a block is defined public
+        All mandatory fields are used
+
+A block will be displayed when the user activates the block into block management area.

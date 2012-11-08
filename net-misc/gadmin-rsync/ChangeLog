@@ -1,0 +1,7 @@
+# ChangeLog for net-misc/gadmin-rsync
+# Copyright 1999-2007 Gentoo Foundation; Distributed under the GPL v2
+
+*gadmin-rsync-0.0.4.ebuild (13 Oct 2007)
+
+  13 Oct 2007; Piotr Szymaniak <lazy_bum@o2.pl> +gadmin-rsync-0.0.4.ebuild:
+  Initial ebuild.

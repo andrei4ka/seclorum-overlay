@@ -1,0 +1,92 @@
+# Copyright 1999-2008 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+EAPI=2
+
+inherit eutils versionator
+
+MY_PV=${PV%.*}
+MY_PV=${MY_PV/./}
+DESCRIPTION="A high-quality scanning and digital camera raw image processing software."
+HOMEPAGE="http://www.hamrick.com/"
+SRC_URI="http://www.hamrick.com/files/vuesca${MY_PV}.tgz -> ${P}.tgz
+	http://www.hamrick.com/vuescan/${PN}.pdf"
+RESTRICT="primaryuri"
+
+LICENSE="vuescan"
+SLOT="0"
+KEYWORDS="~amd64 ~x86"
+IUSE="doc"
+
+MY_LINGUAS="ar bg ca cs da de el en es et fi fr gl he hi hr hu id it ja ko lt lv nl no pb pl pt ro ru sk sl sr sv ta th tl tr tw uk vi zh"
+
+for MY_LINGUA in ${MY_LINGUAS}; do
+	IUSE="${IUSE} linguas_${MY_LINGUA/-/_}"
+done
+
+
+
+S="${WORKDIR}/VueScan"
+
+DEPEND=""
+RDEPEND=">=x11-libs/gtk+-2.0
+		media-gfx/sane-backends
+	x86? ( dev-libs/libusb )
+
+	amd64? ( app-emulation/emul-linux-x86-baselibs
+		 app-emulation/emul-linux-x86-compat
+		 app-emulation/emul-linux-x86-xlibs
+		 app-emulation/emul-linux-x86-gtklibs )"
+
+src_unpack() {
+	unpack ${P}.tgz
+	cd ${S}
+}
+
+src_install() {
+	# Remove unwanted LINGUAS:
+	for LINGUA in ${MY_LINGUAS}; do
+		if ! use linguas_${LINGUA/-/_}; then
+			rm -f lan_"${LINGUA}".txt
+		fi
+	done
+
+	insinto /opt/vuescan
+	doins vuescan.bmp vuescan.dat *htm lan_*
+	if use doc; then
+		doins ${DISTDIR}/${PN}.pdf
+	fi
+
+	exeinto /opt/vuescan
+	doexe vuescan
+	doicon ${FILESDIR}/VueScan.png
+
+	cat > vuescan.desktop <<-EOF
+		[Desktop Entry]
+		Name=VueScan
+		Type=Application
+		Comment=VueScan - easy scanning software
+		Exec=/opt/vuescan/${PN}
+		Icon=VueScan.png
+		Categories=Graphics;Scanning;
+	EOF
+	
+	insinto /usr/share/applications/
+	doins vuescan.desktop
+}
+
+pkg_postinst() {
+	einfo "VueScan expects the webbrowser Mozilla installed in your PATH."
+	einfo "You have to change this in the 'Prefs' tab or make available"
+	einfo "a symlink/script named 'mozilla' starting your favourite browser."
+	einfo "Otherwise VueScan will fail to show the HTML documentation."
+
+	if use amd64 ; then
+		ewarn "VueScan needs 32bit version of the libusb library."
+		ewarn "You need to install it yourself since it is not provided with Gentoo."
+		ewarn "Good luck."
+	fi
+	
+	einfo "To use scanner with Vuescan under user you need add user into scanner group."
+	einfo "Just run under root: gpasswd -a username scanner"
+}

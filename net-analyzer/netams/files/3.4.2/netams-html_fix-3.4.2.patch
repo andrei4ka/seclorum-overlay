@@ -1,0 +1,222 @@
+--- netams-3.4.0rc2.orig/src/html.c	2009-02-08 12:09:03 +0300
++++ netams-3.4.0rc2.orig/src/html.c	2009-02-08 12:15:36 +0300
+@@ -56,10 +56,11 @@ void sHtmlAction(Service_Html *cfg){
+ 
+ 	//=================================================================================
+ 	u_char len=strlen(cfg->path);
+-	char path[512];  		// better change then to dynamic allocation with len [len+256];
++	char *path;  		// better change then to dynamic allocation with len [len+256];
+ 	// we have trick here
+ 	// actually cfg->path is presetted - so we can store it permanently and work only via offset
+ 	// pointed by *file
++	path=(char *)aMalloc(len+256);
+ 	strncpy(path, cfg->path, len);
+ 	char *prefix=&path[len];	//prefix from cfg->path to actual filename
+ 	char *filename;			//from here filename will be printed
+@@ -74,7 +75,7 @@ void sHtmlAction(Service_Html *cfg){
+ 
+ 	//create path
+ 	snprintf(prefix, 255, "/%04d/%02d/%02d/%02d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour);
+-	if (sHSafeMkdir(path)) return;
++	if (sHSafeMkdir(path)) { aFree(path); return; }
+ 	HTML_PUSHD(filename, path);
+ 
+ 	aDebug(DEBUG_HTML, "Creation main data in %s\n", path);
+@@ -82,7 +83,7 @@ void sHtmlAction(Service_Html *cfg){
+ 	//=================================================================================
+ 	// if this is the end of hour, generate hourly report
+ 	snprintf(filename, 255, "time.html");
+-	f=sHOpenFile(f, path); if (!f) return;
++	f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 	snprintf(tmp, 255, Locale(LC_H_TRAFINFO), tm.tm_mday, tm.tm_mon+1, tm.tm_year+1900, tm.tm_hour, tm.tm_mday, tm.tm_mon+1, tm.tm_year+1900, tm.tm_hour+1);
+ 	sHPrintHeader(f, tmp, "index.html");
+ 	fprintf(f, "<div style=\"margin-left : 5%%; align: right;\">\n");
+@@ -92,7 +93,7 @@ void sHtmlAction(Service_Html *cfg){
+ 	//=================================================================================
+ 	// create index file
+ 	snprintf(filename, 255, "index.html");
+-	f=sHOpenFile(f, path); if (!f) return;
++	f=sHOpenFile(f, path); if (!f) { aFree (path); return; }
+ 	sHPrintHeader(f, Locale(LC_H_RUNTIME), "../../../../index.html");
+ 
+ 	fprintf(f, "<h3>%s %02d %s</h3>\n \
+@@ -189,7 +190,7 @@ void sHtmlAction(Service_Html *cfg){
+ 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 	// create SW version
+ 	snprintf(filename, 255, "software-version.html");
+-	f=sHOpenFile(f, path); if (!f) return;
++	f=sHOpenFile(f, path); if (!f) { aFree (path); return; }
+ 	sHPrintHeader(f, Locale(LC_H_SW_VERSION), "index.html");
+ 	fprintf(f, "<pre>\n");
+ 	aCommand("show version", MODE_EXEC, f);
+@@ -199,7 +200,7 @@ void sHtmlAction(Service_Html *cfg){
+ 	// create Quota state
+ 	if(Quota) {
+ 		snprintf(filename, 255, "software-quota.html");
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree (path); return; }
+ 		snprintf(tmp, 255, "%s %s", Locale(LC_H_SERV_STATE), Locale(LC_H_SERV_QUOTA));
+ 		sHPrintHeader(f, tmp, "index.html");
+ 		fprintf(f, "<pre>\n");
+@@ -211,7 +212,7 @@ void sHtmlAction(Service_Html *cfg){
+ 	// create Login state
+ 	if(Login) {
+ 		snprintf(filename, 255, "software-login.html");
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 		snprintf(tmp, 255, "%s %s", Locale(LC_H_SERV_STATE), Locale(LC_H_SERV_LOGIN));
+ 		sHPrintHeader(f, tmp, "index.html");
+ 		fprintf(f, "<pre>\n");
+@@ -222,7 +223,7 @@ void sHtmlAction(Service_Html *cfg){
+ 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 	// create SW log
+ 	snprintf(filename, 255, "software-config.html");
+-	f=sHOpenFile(f, path); if (!f) return;
++	f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 	sHPrintHeader(f, Locale(LC_H_RUNNING_CONFIG), "index.html");
+ 	fprintf(f, "<pre>\n");
+ 	aCommand("show config", MODE_EXEC, f);
+@@ -320,7 +321,7 @@ void sHtmlAction(Service_Html *cfg){
+ 		///////////////////////////////////////////////////////////////////////////////
+ 		// create top pages
+ 		snprintf(filename, 255, "top.html");
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 		snprintf(tmp, 255, "%s %s %s", Locale(LC_H_TOPUSERS), Locale(LC_H_CURRENT), Locale(LC_H_CHOUR));
+ 		sHPrintHeader(f, tmp, "index.html");
+ 		sHPrintTHeaderTopData(f, Locale(LC_H_CHOUR));
+@@ -332,7 +333,7 @@ void sHtmlAction(Service_Html *cfg){
+ 		sPrintFooter(f, "index.html");
+ 		///////////////////////////////////////////////////////////////////////////////
+ 		snprintf(filename, 255, "../top.html");
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 		snprintf(tmp, 255, "%s %s %s", Locale(LC_H_TOPUSERS), Locale(LC_H_CURRENT), Locale(LC_H_CDAY));
+ 		sHPrintHeader(f, tmp, "index.html", "../../../..");
+ 		sHPrintTHeaderTopData(f, Locale(LC_H_CDAY));
+@@ -344,7 +345,7 @@ void sHtmlAction(Service_Html *cfg){
+ 		sPrintFooter(f, "index.html");
+ 		///////////////////////////////////////////////////////////////////////////////
+ 		snprintf(filename, 255, "../top-week.html");
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 		snprintf(tmp, 255, "%s %s %s", Locale(LC_H_TOPUSERS), Locale(LC_H_CURRENT2), Locale(LC_H_CWEEK2));
+ 		sHPrintHeader(f, tmp, "index.html", "../../../..");
+ 		sHPrintTHeaderTopData(f, Locale(LC_H_CWEEK));
+@@ -356,7 +357,7 @@ void sHtmlAction(Service_Html *cfg){
+ 		sPrintFooter(f, "index.html");
+ 		///////////////////////////////////////////////////////////////////////////////
+ 		snprintf(filename, 255, "../../top.html");
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 		snprintf(tmp, 255, "%s %s %s", Locale(LC_H_TOPUSERS), Locale(LC_H_CURRENT), Locale(LC_H_CMONTH));
+ 		sHPrintHeader(f, tmp, "index.html", "../../../..");
+ 		sHPrintTHeaderTopData(f, Locale(LC_H_CMONTH));
+@@ -377,7 +378,7 @@ void sHtmlAction(Service_Html *cfg){
+ 	// create billing log
+ 	if(Billing) {
+ 		snprintf(filename, 255, "software-billing.html");
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 		snprintf(tmp, 255, "%s %s", Locale(LC_H_SERV_STATE), Locale(LC_H_SERV_BILLING));
+ 		sHPrintHeader(f, tmp, "index.html");
+ 		cShowBillingHtml(f, cfg);
+@@ -394,7 +395,7 @@ void sHtmlAction(Service_Html *cfg){
+ 	HTML_PUSHD(filename, path);
+ 
+ 	snprintf(filename, 255, "index.html");
+-	f=sHOpenFile(f, path); if (!f) return;
++	f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 	sHPrintHeader(f, Locale(LC_H_RUNTIME), "../../index.html", "../../..");
+ 
+ 	fprintf(f, "<h3>%s: %s</h3>\n <div style=\"margin-left : 5%%;\"> \n",
+@@ -462,13 +463,13 @@ void sHtmlAction(Service_Html *cfg){
+ 		///////////////////////////////////////////////////////////////////////////////
+ 		//create path
+ 		snprintf(prefix, 255, "/clients/%s/%04d/%02d", u->name, tm.tm_year+1900, tm.tm_mon+1);
+-		if (sHSafeMkdir(path)) return;
++		if (sHSafeMkdir(path)) { aFree(path); return; }
+ 		HTML_PUSHD(filename, path);
+ 		aDebug(DEBUG_HTML, "Creation client %s pages in %s\n", u->name, path);
+ 
+ 		///////////////////////////////////////////////////////////////////////////////
+ 		snprintf(filename, 255, "index-day-%02d.html", tm.tm_mday);
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 		sHPrintHeader(f, Locale(LC_H_TRAFINFO_SELECTED), "javascript:history.go(-1)");
+ 
+ 		switch (u->type) {
+@@ -568,7 +569,7 @@ void sHtmlAction(Service_Html *cfg){
+ 		///////////////////////////////////////////////////////////////////////////////
+ 		// generate month index page
+ 		snprintf(filename, 255, "index.html");
+-		f=sHOpenFile(f, path); if (!f) return;
++		f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 		sHPrintHeader(f, Locale(LC_H_RUNTIME), "../../index.html");
+ 		fprintf(f, "<h3>%s: %s</h3>\n <div style=\"margin-left : 5%%;\"> \n",
+ 			Locale(LC_H_INDEX_MONTH), mon_name[tm.tm_mon]);
+@@ -590,7 +591,7 @@ void sHtmlAction(Service_Html *cfg){
+ 		if (cfg->is_htaccess && u->flags&NETUNIT_CHANGED) {
+ 			if (u->password) {
+ 				snprintf(filename, 255, "/clients/%s/.htaccess", u->name);
+-				f=sHOpenFile(f, path); if (!f) return;
++				f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 				fprintf(f, "AuthName \"NeTAMS User Login\"\n Require user");
+ 				Users->listUsersHtml(f);
+ 				if (cfg->is_htaccess==2)
+@@ -609,7 +610,7 @@ ACCESS:
+ 	if (cfg->is_htaccess) {
+ 		if (Users->changed_user) {
+ 			snprintf(filename, 255, "/.htaccess");
+-			f=sHOpenFile(f, path); if (!f) return;
++			f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 			fprintf(f, "AuthName \"NeTAMS Administrators Only\"\n Require user");
+ 			Users->listUsersHtml(f);
+ 			if (cfg->is_htaccess==2)
+@@ -621,7 +622,7 @@ ACCESS:
+ 
+ 		if (cfg->is_htaccess==1 && Users->changed_pw) {
+ 			snprintf(filename, 255, "/.htpasswd");
+-			f=sHOpenFile(f, path); if (!f) return;
++			f=sHOpenFile(f, path); if (!f) { aFree(path); return; }
+ 			Users->listPasswordsHtml(f);
+ 			Units->listPasswordsHtml(f);
+ 		}
+@@ -629,6 +630,7 @@ ACCESS:
+ 	//=================================================================================
+ 	//clear connection
+ 	if(f) fclose(f);
++	aFree(path);
+ }
+ //////////////////////////////////////////////////////////////////////////////////////////
+ FILE* sHOpenFile(FILE *file, char *filename){
+@@ -650,7 +652,7 @@ int sHSafeMkdir(char *temp){  // this eq
+ 	bzero(&sb, sizeof (struct stat));
+ 
+ 	int i=stat(temp, &sb);
+-	if (!(sb.st_mode & S_IFDIR) || i) {
++	if (i) {
+ 		i=mkdir(temp, 0711);
+ 		if (i) {
+ 			i=(strrchr(temp, '/')-temp);
+@@ -661,7 +663,10 @@ int sHSafeMkdir(char *temp){  // this eq
+ 				i=sHSafeMkdir(prefix);		//recurse
+ 				aFree(prefix);
+ 
+-				if(i) return -1;		//if error on previous level no need to continue
++                                if(i) {         //if error on previous level no need to continue
++                                        aLog(D_INFO, "failed to create %s\n", temp);
++                                        return -1;
++                                }
+ 
+ 				i=mkdir(temp, 0711);		//there is no error, retry to create
+ 			} else  i=-1;	//ensure this is error
+@@ -672,7 +677,7 @@ int sHSafeMkdir(char *temp){  // this eq
+ 			}
+ 		}
+ 		aDebug(DEBUG_HTML, "make directory %s\n", temp);
+-	} else if (!(sb.st_mode & S_IFDIR)) {
++	} else if (!S_ISDIR(sb.st_mode)) {
+ 		aLog(D_INFO, "failed to create %s, file already exist and not directory\n", temp);
+ 		return -1;
+ 	}

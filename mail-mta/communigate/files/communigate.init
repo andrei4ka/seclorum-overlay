@@ -1,0 +1,44 @@
+#!/sbin/runscript
+# Copyright 1999-2007 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header:
+APPLICATION="/opt/CommuniGate"
+MYBASE="/var/CommuniGate"
+
+opts="start stop controller"
+
+depend() {
+       need net
+       use logger dns
+       provide mta
+}
+
+start() {
+       ebegin "Starting Communigate Pro"
+       umask 0
+       ulimit -u ${ULIMIT_U}
+       ulimit -n ${ULIMIT_N}
+
+       start-stop-daemon --start --quiet --user root --group mail --exec ${APPLICATION}/CGServer -- --Base ${MYBASE} --Daemon ${SUPPLPARAMS}
+       result=$?
+       eend $result
+}
+
+controller() {
+       ebegin "Starting CommuniGate Pro Cluster Controller"
+       umask 0
+       ulimit -u ${CL_ULIMIT_U}
+       ulimit -n ${CL_ULIMIT_N}
+
+       start-stop-daemon --start --user root --group mail --quiet --exec ${APPLICATION}/CGServer -- --Base ${MYBASE} --Daemon ${CL_SUPPLPARAMS} --ClusterController
+       result=$?
+       eend $result
+}
+
+stop() {
+       ebegin "Shutting down the CommuniGate Pro Server"
+       start-stop-daemon --stop --quiet --pidfile /var/CommuniGate/ProcessID
+       sleep 5
+       result=$?
+       eend $result
+}

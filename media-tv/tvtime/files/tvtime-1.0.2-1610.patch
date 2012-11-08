@@ -1,0 +1,344 @@
+diff -urN tvtime-1.0.2.orig/src/tvtime.c tvtime-1.0.2/src/tvtime.c
+--- tvtime-1.0.2.orig/src/tvtime.c	2005-09-08 04:55:54.000000000 +0200
++++ tvtime-1.0.2/src/tvtime.c	2008-06-25 15:19:29.000000000 +0200
+@@ -903,10 +903,11 @@
+     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "matte" );
+     cur++;
+ 
+-    snprintf( string, sizeof( string ), widescreen ?
+-              TVTIME_ICON_GENERALTOGGLEON "  %s" :
+-              TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+-              _("16:9 output") );
++    char *ratio = "4:3";
++    if (widescreen == 1) ratio = "16:9";
++    else if (widescreen == 2) ratio = "16:10";
++    snprintf( string, sizeof( string ), TVTIME_ICON_APPLYMATTE "  %s (%s)",
++              _("Aspect ratio"), ratio);
+     menu_set_text( menu, cur, string );
+     menu_set_enter_command( menu, cur, TVTIME_TOGGLE_ASPECT, "" );
+     cur++;
+@@ -1062,7 +1063,33 @@
+     char string[ 128 ];
+ 
+     menu_set_back_command( menu, TVTIME_SHOW_MENU, "output" );
+-    if( sixteennine ) {
++    if( sixteennine == 2 ) {
++        snprintf( string, sizeof( string ), (mode == 0) ?
++                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
++                  _("16:10 + Overscan") );
++        menu_set_text( menu, 1, string );
++        menu_set_enter_command( menu, 1, TVTIME_SET_MATTE, "16:10" );
++        snprintf( string, sizeof( string ), (mode == 1) ?
++                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
++                  _("1.85:1") );
++        menu_set_text( menu, 2, string );
++        menu_set_enter_command( menu, 2, TVTIME_SET_MATTE, "1.85:1" );
++        snprintf( string, sizeof( string ), (mode == 2) ?
++                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
++                  _("2.35:1") );
++        menu_set_text( menu, 3, string );
++        menu_set_enter_command( menu, 3, TVTIME_SET_MATTE, "2.35:1" );
++        snprintf( string, sizeof( string ), (mode == 3) ?
++                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
++                  _("4:3 centre") );
++        menu_set_text( menu, 4, string );
++        menu_set_enter_command( menu, 4, TVTIME_SET_MATTE, "4:3" );
++        snprintf( string, sizeof( string ), (mode == 4) ?
++                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
++                  _("16:9") );
++        menu_set_text( menu, 5, string );
++        menu_set_enter_command( menu, 5, TVTIME_SET_MATTE, "16:9" );
++    } else if( sixteennine == 1 ) {
+         snprintf( string, sizeof( string ), (mode == 0) ?
+                   TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+                   _("16:9 + Overscan") );
+@@ -1125,8 +1152,15 @@
+ static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
+ {
+     tvtime_osd_list_set_lines( osd, 6 );
+-    if( sixteennine ) {
+-        tvtime_osd_list_set_text( osd, 0, _("Matte setting (Anamorphic input)") );
++    if( sixteennine == 2) {
++        tvtime_osd_list_set_text( osd, 0, _("Matte setting (16:10 input)") );
++        tvtime_osd_list_set_text( osd, 1, _("16:10 + Overscan") );
++        tvtime_osd_list_set_text( osd, 2, "1.85:1" );
++        tvtime_osd_list_set_text( osd, 3, "2.35:1" );
++        tvtime_osd_list_set_text( osd, 4, _("4:3 centre") );
++        tvtime_osd_list_set_text( osd, 5, "16:9" );
++    } else if( sixteennine == 1 ) {
++        tvtime_osd_list_set_text( osd, 0, _("Matte setting (16:9 input)") );
+         tvtime_osd_list_set_text( osd, 1, _("16:9 + Overscan") );
+         tvtime_osd_list_set_text( osd, 2, "1.85:1" );
+         tvtime_osd_list_set_text( osd, 3, "2.35:1" );
+@@ -1445,7 +1479,7 @@
+ 
+     /* Setup OSD stuff. */
+     pixel_aspect = ( (double) width ) /
+-        ( ( (double) height ) * ( sixteennine ? (16.0 / 9.0) : (4.0 / 3.0) ) );
++        ( ( (double) height ) * ( sixteennine==2 ? (16.0 / 10.0) : ( sixteennine==1 ? (16.0 / 9.0) : (4.0 / 3.0) ) ) );
+     osd = tvtime_osd_new( width, height, pixel_aspect, fieldtime,
+                           config_get_channel_text_rgb( ct ),
+                           config_get_other_text_rgb( ct ) );
+@@ -1769,8 +1803,16 @@
+         if( commands_toggle_aspect( commands ) ) {
+             matte_mode = 0;
+             output->set_matte( 0, 0 );
+-            if( output->toggle_aspect() ) {
+-                sixteennine = 1;
++            sixteennine = output->toggle_aspect();
++            if( sixteennine == 2 ) {
++                if( osd ) {
++                    tvtime_osd_show_message( osd,
++                          _("16:10 display mode active.") );
++                }
++                config_save( ct, "WideScreen", "2" );
++                pixel_aspect = ( (double) width ) /
++                    ( ( (double) height ) * (16.0 / 10.0) );
++            } else if( sixteennine == 1 ) {
+                 if( osd ) {
+                     tvtime_osd_show_message( osd,
+                           _("16:9 display mode active.") );
+@@ -1779,7 +1821,6 @@
+                 pixel_aspect = ( (double) width ) /
+                     ( ( (double) height ) * (16.0 / 9.0) );
+             } else {
+-                sixteennine = 0;
+                 if( osd ) {
+                     tvtime_osd_show_message( osd,
+                           _("4:3 display mode active.") );
+@@ -1842,69 +1883,94 @@
+         if( commands_toggle_matte( commands ) ||
+             commands_get_matte_mode( commands ) ) {
+             double matte = 4.0 / 3.0;
+-            int sqwidth = sixteennine ?
+-                ((height * 16) / 9) : ((height * 4) / 3);
+-            int sqheight = sixteennine ?
+-                ((width * 9) / 16) : ((width * 3) / 4);
++
++            int sqwidth = sixteennine==2 ? ((height * 16) / 10) : ( sixteennine==1 ? ((height * 16) / 9) : ((height * 4) / 3) );
++            int sqheight = sixteennine==2 ? ((width * 10) / 16) : ( sixteennine==1 ? ((width * 9) / 16) : ((width * 3) / 4) );
+ 
+             matte_x = 0;
+             matte_w = width;
+             if( commands_toggle_matte( commands ) ) {
+                 matte_mode = (matte_mode + 1) % 5;
+             } else {
+-                if( !strcmp( commands_get_matte_mode( commands ), "16:9" ) ) {
+-                    matte_mode = sixteennine ? 0 : 1;
+-                } else if( !strcmp( commands_get_matte_mode( commands ),
+-                                    "16:10" ) ) {
+-                    matte_mode = sixteennine ? 4 : 2;
+-                } else if( !strcmp( commands_get_matte_mode( commands ),
+-                                    "1.85:1" ) ) {
+-                    matte_mode = sixteennine ? 1 : 3;
+-                } else if( !strcmp( commands_get_matte_mode( commands ),
+-                                    "2.35:1" ) ) {
+-                    matte_mode = sixteennine ? 2 : 4;
+-                } else {
+-                    matte_mode = sixteennine ? 3 : 0;
+-                }
++		if (sixteennine==2)
++		{
++			if( !strcmp( commands_get_matte_mode( commands ), "16:9" ) ) {
++				matte_mode = 4;
++				matte = 16.0 / 9.0;
++			} else if( !strcmp( commands_get_matte_mode( commands ), "16:10" ) ) {
++				matte_mode = 0;
++				matte = 1.6;
++			} else if( !strcmp( commands_get_matte_mode( commands ), "1.85:1" ) ) {
++				matte_mode = 1;
++				matte = 1.85;
++			} else if( !strcmp( commands_get_matte_mode( commands ), "2.35:1" ) ) {
++				matte_mode = 2;
++				matte = 2.35;
++			} else {
++				matte_mode = 3;
++				matte = 4.0 / 3.0;
++				matte_w = (int) (((double) sqheight * matte) + 0.5);
++				matte_x = (width - matte_w) / 2;
++				/* We're cropping the sides off so we add overscan to avoid mess
++				* at the top of the screen. */
++				matte_y = commands_get_overscan( commands ) * height / 2;
++				matte_h = height - matte_y;
++				output->set_matte( (matte_h * 4) / 3, matte_h );
++			}
++		}
++		else if (sixteennine==1)
++		{
++			if( !strcmp( commands_get_matte_mode( commands ), "16:9" ) ) {
++				matte_mode = 0;
++				matte = 16.0 / 9.0;
++			} else if( !strcmp( commands_get_matte_mode( commands ), "16:10" ) ) {
++				matte_mode = 4;
++				matte = 1.6;
++				matte_w = (int) (((double) sqheight * matte) + 0.5);
++				matte_x = (width - matte_w) / 2;
++				/* We're cropping the sides off so we add overscan to avoid mess
++				* at the top of the screen. */
++				matte_y = commands_get_overscan( commands ) * height / 2;
++				matte_h = height - matte_y;
++				output->set_matte( (matte_h * 16) / 10, matte_h );
++			} else if( !strcmp( commands_get_matte_mode( commands ), "1.85:1" ) ) {
++				matte_mode = 1;
++				matte = 1.85;
++			} else if( !strcmp( commands_get_matte_mode( commands ), "2.35:1" ) ) {
++				matte_mode = 2;
++				matte = 2.35;
++			} else {
++				matte_mode = 3;
++				matte = 4.0 / 3.0;
++				matte_w = (int) (((double) sqheight * matte) + 0.5);
++				matte_x = (width - matte_w) / 2;
++				/* We're cropping the sides off so we add overscan to avoid mess
++				* at the top of the screen. */
++				matte_y = commands_get_overscan( commands ) * height / 2;
++				matte_h = height - matte_y;
++				output->set_matte( (matte_h * 4) / 3, matte_h );
++			}
++		}
++		else if (sixteennine==0)
++		{
++			if( !strcmp( commands_get_matte_mode( commands ), "16:9" ) ) {
++				matte_mode = 1;
++				matte = 16.0 / 9.0;
++			} else if( !strcmp( commands_get_matte_mode( commands ), "16:10" ) ) {
++				matte_mode = 2;
++				matte = 1.6;
++			} else if( !strcmp( commands_get_matte_mode( commands ), "1.85:1" ) ) {
++				matte_mode = 3;
++				matte = 1.85;
++			} else if( !strcmp( commands_get_matte_mode( commands ), "2.35:1" ) ) {
++				matte_mode = 4;
++				matte = 2.35;
++			} else {
++				matte_mode = 0;
++			}
++		}
+             }
+ 
+-            if( sixteennine ) {
+-                if( matte_mode == 0 ) {
+-                    matte = 16.0 / 9.0;
+-                } else if( matte_mode == 1 ) {
+-                    matte = 1.85;
+-                } else if( matte_mode == 2 ) {
+-                    matte = 2.35;
+-                } else if( matte_mode == 3 ) {
+-                    matte = 4.0 / 3.0;
+-                    matte_w = (int) (((double) sqheight * matte) + 0.5);
+-                    matte_x = (width - matte_w) / 2;
+-                    /* We're cropping the sides off so we add overscan to avoid mess
+-                     * at the top of the screen. */
+-                    matte_y = commands_get_overscan( commands ) * height / 2;
+-                    matte_h = height - matte_y;
+-                    output->set_matte( (matte_h * 4) / 3, matte_h );
+-                } else if( matte_mode == 4 ) {
+-                    matte = 1.6;
+-                    matte_w = (int) (((double) sqheight * matte) + 0.5);
+-                    matte_x = (width - matte_w) / 2;
+-                    /* We're cropping the sides off so we add overscan to avoid mess
+-                     * at the top of the screen. */
+-                    matte_y = commands_get_overscan( commands ) * height / 2;
+-                    matte_h = height - matte_y;
+-                    output->set_matte( (matte_h * 16) / 10, matte_h );
+-                }
+-            } else {
+-                if( matte_mode == 1 ) {
+-                    matte = 16.0 / 9.0;
+-                } else if( matte_mode == 2 ) {
+-                    matte = 1.6;
+-                } else if( matte_mode == 3 ) {
+-                    matte = 1.85;
+-                } else if( matte_mode == 4 ) {
+-                    matte = 2.35;
+-                }
+-            }
+             if( !matte_x ) {
+                 matte_h = (int) ((((double) sqwidth)/matte) + 0.5);
+                 matte_y = (height - matte_h) / 2;
+diff -urN tvtime-1.0.2.orig/src/tvtimeconf.c tvtime-1.0.2/src/tvtimeconf.c
+--- tvtime-1.0.2.orig/src/tvtimeconf.c	2005-09-08 06:07:56.000000000 +0200
++++ tvtime-1.0.2/src/tvtimeconf.c	2008-06-25 15:05:29.000000000 +0200
+@@ -590,6 +590,7 @@
+ {
+     lfprintf( stderr, _("usage: %s [OPTION]...\n\n"), argv[ 0 ] );
+     lfputs( _("  -a, --widescreen           16:9 mode.\n"), stderr );
++    lfputs( _("  -e, --widescreen1610       16:10 mode.\n"), stderr );
+     lfputs( _("  -A, --nowidescreen         4:3 mode.\n"), stderr );
+     lfputs( _("  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"), stderr );
+     lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
+@@ -642,6 +643,7 @@
+ {
+     lfprintf( stderr, _("usage: %s [OPTION]...\n\n"), argv[ 0 ] );
+     lfputs( _("  -a, --widescreen           16:9 mode.\n"), stderr );
++    lfputs( _("  -e, --widescreen1610       16:10 mode.\n"), stderr );
+     lfputs( _("  -A, --nowidescreen         4:3 mode.\n"), stderr );
+     lfputs( _("  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"), stderr );
+     lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
+@@ -894,6 +896,7 @@
+         { "window", 0, 0, 'M' },
+         { "slave", 0, 0, 'k' },
+         { "widescreen", 0, 0, 'a' },
++        { "widescreen1610", 0, 0, 'e' },
+         { "nowidescreen", 0, 0, 'A' },
+         { "xmltv", 1, 0, 't' },
+         { "xmltvlanguage", 1, 0, 'l' },
+@@ -907,10 +910,11 @@
+     int c;
+ 
+     if( argc ) {
+-        while( (c = getopt_long( argc, argv, "aAhkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:X:t:l:Qg:",
++        while( (c = getopt_long( argc, argv, "aeAhkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:X:t:l:Qg:",
+                 long_options, &option_index )) != -1 ) {
+             switch( c ) {
+             case 'a': ct->aspect = 1; break;
++            case 'e': ct->aspect = 2; break;
+             case 'A': ct->aspect = 0; break;
+             case 'k': ct->slave_mode = 1; break;
+             case 'm': ct->fullscreen = 1; break;
+@@ -1034,6 +1038,7 @@
+         { "fullscreen", 0, 0, 'm' },
+         { "window", 0, 0, 'M' },
+         { "widescreen", 0, 0, 'a' },
++        { "widescreen1610", 0, 0, 'e' },
+         { "nowidescreen", 0, 0, 'A' },
+         { "xmltv", 2, 0, 't' },
+         { "xmltvlanguage", 2, 0, 'l' },
+@@ -1049,10 +1054,11 @@
+         return 0;
+     }
+ 
+-    while( (c = getopt_long( argc, argv, "aAhmMF:g:I:d:b:i:c:n:D:f:x:t:l:R:",
++    while( (c = getopt_long( argc, argv, "aeAhmMF:g:I:d:b:i:c:n:D:f:x:t:l:R:",
+             long_options, &option_index )) != -1 ) {
+         switch( c ) {
+         case 'a': ct->aspect = 1; break;
++        case 'e': ct->aspect = 2; break;
+         case 'A': ct->aspect = 0; break;
+         case 'm': ct->fullscreen = 1; break;
+         case 'M': ct->fullscreen = 0; break;
+diff -urN tvtime-1.0.2.orig/src/xcommon.c tvtime-1.0.2/src/xcommon.c
+--- tvtime-1.0.2.orig/src/xcommon.c	2005-08-14 19:36:52.000000000 +0200
++++ tvtime-1.0.2/src/xcommon.c	2008-06-25 15:15:55.000000000 +0200
+@@ -301,8 +301,8 @@
+  */
+ static void xv_get_output_aspect( int *px_widthratio, int *px_heightratio )
+ {
+-    int metric_widthratio = output_aspect ? 16 : 4;
+-    int metric_heightratio = output_aspect ? 9 : 3;
++    int metric_widthratio = output_aspect==2 ? 16 : ( output_aspect==1 ? 16 : 4 );
++    int metric_heightratio = output_aspect==2 ? 10 : ( output_aspect==1 ? 9 : 3 );
+     int sar_frac_w, sar_frac_h;
+ 
+     if( matte_height ) {
+@@ -1364,7 +1364,7 @@
+ 
+ int xcommon_toggle_aspect( void )
+ {
+-    output_aspect = !output_aspect;
++    output_aspect = (output_aspect+1)%3;
+     calculate_video_area();
+     xcommon_clear_screen();
+     return output_aspect;
+
+ 	  	 

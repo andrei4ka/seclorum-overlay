@@ -1,0 +1,19 @@
+# ChangeLog for www-apps/jinzora
+# Copyright 1999-2007 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+  13 Sep 2007; Jakub Moc <jakub@gentoo.org> jinzora-2.7.5.ebuild:
+  Use virtual/httpd-cgi for webserver dependency
+
+  07 Sep 2007; Jakub Moc <jakub@gentoo.org> -jinzora-2.3.7.ebuild,
+  +jinzora-2.7.5.ebuild:
+  Version bump, remove old. Fix dependencies, do not depends on apache
+  unconditionally, check for PHP features for DB backends, add pkg_postinst
+  info about optional tools.
+
+  05 Jan 2006; Renat Lumpau <rl03@gentoo.org> ChangeLog:
+  Fixed ticket #6
+
+  20 Dec 2005; Renat Lumpau <rl03@gentoo.org> ChangeLog:
+  Initial ebuild wrt bug #52517.
+

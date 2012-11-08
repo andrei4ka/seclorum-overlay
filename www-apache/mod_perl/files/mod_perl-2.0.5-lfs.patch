@@ -1,0 +1,11 @@
+--- mod_perl-2.0.5/lib/Apache2/Build.pm-	2011-02-02 23:23:47.000000000 +0300
++++ mod_perl-2.0.5/lib/Apache2/Build.pm	2011-10-14 05:40:05.708800026 +0400
+@@ -2157,6 +2157,7 @@ sub has_large_files_conflict {
+ # effects created by uselargefiles, e.g. Off_t=8 instead of Off_t=4)
+ sub strip_lfs {
+     my ($self, $cflags) = @_;
++    return $cflags;
+     return $cflags unless $self->has_large_files_conflict();
+ 
+     my $lf = $Config{ccflags_uselargefiles}
+

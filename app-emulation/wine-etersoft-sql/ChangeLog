@@ -1,0 +1,31 @@
+# ChangeLog for app-emulation/wine-etersoft-sql
+# Copyright 2002-2007 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+
+  25 Mar 2008; <johnrdoe63@cregion.ru> Changelog :
+  Version bump
+  Change to use rpm file from ALTLinux
+
+*wine-etersoft-sql-1.0.8 (07 Feb 2008)
+
+  07 Feb 2008; <johnrdoe63@cregion.ru> Changelog :
+  fix a dependence for binary packet
+  +files/eter_acl alternate check_access
+
+  04 Feb 2008; <johnrdoe63@cregion.ru> Changelog :
+  adding 1.0.8
+  fix of conformity of versions
+
+  08 Aug 2007; <johnrdoe63@cregion.ru> Changelog :
+  stable 1.0.6 on x86
+
+*wine-etersoft-sql-1.0.7n (01 Aug 2007)
+
+  01 Aug 2007; JohnRDoe63 <johnrdoe63@cregion.ru> :
+  initial import
+
+*wine-etersoft-sql-1.0.6 (01 Aug 2007)
+
+  1 Aug 2007; JohnRDoe63 <johnrdoe63@cregion.ru> :
+  Initial import

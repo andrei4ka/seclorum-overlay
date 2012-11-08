@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/linamh/!svn/ver/887/trunk/mds/net-ftp/atftp
+END
+metadata.xml
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/metadata.xml
+END
+atftp-0.7-r2.ebuild
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/linamh/!svn/ver/887/trunk/mds/net-ftp/atftp/atftp-0.7-r2.ebuild
+END
+Manifest
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/linamh/!svn/ver/887/trunk/mds/net-ftp/atftp/Manifest
+END
+ChangeLog
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/linamh/!svn/ver/887/trunk/mds/net-ftp/atftp/ChangeLog
+END

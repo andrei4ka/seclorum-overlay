@@ -1,0 +1,11 @@
+Browse to http://${VHOST_HOSTNAME}/${VHOST_APPDIR}
+
+Dont forget add:
+    scgi_port = 127.0.0.1:5000
+to ~/rtorrent.rc
+
+If you are use apache, then:
+1. emerge www-apache/mod_scgi
+2. Edit /etc/conf.d/apache and add \"-D SCGI\" to APACHE_OPTS
+3. Edit /etc/apache2/modules.d/20_mod_scgi.conf and add after LoadModule
+    SCGIMount /RPC2 127.0.0.1:5000

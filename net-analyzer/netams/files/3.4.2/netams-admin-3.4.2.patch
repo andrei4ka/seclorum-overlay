@@ -1,0 +1,12 @@
+diff -Naur netams-3.4.0rc2.orig/cgi-bin/admintool.cgi netams-3.4.0rc2/cgi-bin/admintool.cgi
+--- netams-3.4.0rc2.orig/cgi-bin/admintool.cgi	2004-05-06 14:49:54 +0400
++++ netams-3.4.0rc2/cgi-bin/admintool.cgi	2007-06-07 02:46:00 +0400
+@@ -7,6 +7,7 @@
+ $cgi=new CGI;
+ $uri=$ENV{"REQUEST_URI"};
+ #$host=$ENV{"SERVER_NAME"};
++if ($uri =~ m/\/$/){$uri=$uri."admintool.cgi"}
+ $uri=~s/admintool.cgi/admin\/index.cgi/;
+ #$url="http://$host$uri";
+ $url="$uri";
+ print $cgi->redirect($url);

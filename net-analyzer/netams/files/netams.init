@@ -1,0 +1,32 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header:
+
+depend() {
+    need net mysql
+}
+
+
+daemondir=/usr/local/sbin
+path_to_etc=/etc/
+
+
+start() {
+	ebegin "Starting netams"
+        /bin/mkdir -p /var/run/netams
+        if [ -x $daemondir/netams ]; then
+                if [ -f $path_to_etc/netams.cfg ]; then
+                        $daemondir/netams -lf $path_to_etc/netams.cfg >/dev/null 
+			eend $?
+		else
+		    eend 1
+                fi
+	else
+	    eend 1
+        fi
+}
+
+stop() {
+        killall ${KILL_OPTS} netams
+}

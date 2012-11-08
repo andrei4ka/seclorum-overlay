@@ -1,0 +1,5 @@
+#!/bin/bash
+
+service=$1 ; shift
+/etc/init.d/$service "$@"
+

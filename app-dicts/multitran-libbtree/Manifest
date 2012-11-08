@@ -1,0 +1,8 @@
+DIST libbtree-0.0.1alpha2.tar.bz2 58461 RMD160 3ca0706233006cf81e9bf51b62228bad18d04a2b SHA1 c86d0943ddcaf2cf50d39e702129574ebc9c68b7 SHA256 34a584e45058950337ff9342693b6739b52c3ce17e66440526c4bd6f9575802c
+EBUILD multitran-libbtree-0.0.1_alpha2.ebuild 641 RMD160 929a1f5e0685bfcdad7eff593f55e0bfbb0e829a SHA1 7383652e58964558437588e9cef9b00578292a91 SHA256 74bd79cf1558b6a63864172c24d87481470336550dfaba150ae25988b779f55e
+MD5 db0af7d6ac4cf449a52113fd557989e0 multitran-libbtree-0.0.1_alpha2.ebuild 641
+RMD160 929a1f5e0685bfcdad7eff593f55e0bfbb0e829a multitran-libbtree-0.0.1_alpha2.ebuild 641
+SHA256 74bd79cf1558b6a63864172c24d87481470336550dfaba150ae25988b779f55e multitran-libbtree-0.0.1_alpha2.ebuild 641
+MD5 e716339f9ab653b693b3a26d2b302530 files/digest-multitran-libbtree-0.0.1_alpha2 262
+RMD160 ef3cad09a46da20362c5ab60da2d8279da38d10c files/digest-multitran-libbtree-0.0.1_alpha2 262
+SHA256 0fd6171ee69d3caabaeb8d91c386831fa6855d002d7490a6a9dbb47f78635487 files/digest-multitran-libbtree-0.0.1_alpha2 262

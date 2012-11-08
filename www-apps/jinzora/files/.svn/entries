@@ -1,0 +1,40 @@
+8
+
+dir
+851
+http://overlays.gentoo.org/svn/proj/webapps/experimental/www-apps/jinzora/files
+http://overlays.gentoo.org/svn/proj/webapps
+
+
+
+2007-09-15T12:22:20.883044Z
+639
+jakub
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+cdbf696a-7a06-0410-8f4f-fc8929780e39
+
+postinstall-en.txt
+file
+
+
+
+
+2008-09-04T10:02:50.000000Z
+f99f4f402d470cd338e74c6ae5f2468a
+2007-09-15T12:22:20.883044Z
+639
+jakub
+

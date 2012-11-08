@@ -1,0 +1,541 @@
+diff -ru transmission-1.76-orig/gtk/details.c transmission-1.76/gtk/details.c
+--- transmission-1.76-orig/gtk/details.c	2009-10-25 02:47:33.000000000 +0100
++++ transmission-1.76/gtk/details.c	2009-11-01 02:02:46.586839525 +0100
+@@ -44,6 +44,7 @@
+     GtkWidget * downLimitedCheck;
+     GtkWidget * downLimitSpin;
+     GtkWidget * bandwidthCombo;
++    GtkWidget * cheatModeCombo;
+     GtkWidget * seedGlobalRadio;
+     GtkWidget * seedForeverRadio;
+     GtkWidget * seedCustomRadio;
+@@ -56,6 +57,7 @@
+     guint downLimitSpinTag;
+     guint upLimitSpinTag;
+     guint bandwidthComboTag;
++    guint cheatModeComboTag;
+     guint seedForeverRadioTag;
+     guint seedGlobalRadioTag;
+     guint seedCustomRadioTag;
+@@ -295,6 +297,20 @@
+             unset_combo( di->bandwidthCombo, di->bandwidthComboTag );
+     }
+ 
++    /* cheatModeCombo */
++    if( n ) {
++        const uint8_t baseline = tr_torrentGetCheatMode( torrents[0] );
++        int i;
++        for( i=1; i<n; ++i)
++            if( baseline != tr_torrentGetCheatMode( torrents[i] ) )
++                break;
++        if( i == n )
++            set_int_combo_if_different( di->cheatModeCombo,
++                                        di->cheatModeComboTag, 0, baseline);
++        else
++            unset_combo( di->cheatModeCombo, di->cheatModeComboTag );
++    }
++
+     /* seedGlobalRadio */
+     /* seedForeverRadio */
+     /* seedCustomRadio */
+@@ -494,6 +510,57 @@
+     return w;
+ }
+ 
++static void
++onCheatModeChanged( GtkComboBox * w, struct DetailsImpl * di )
++{
++    GtkTreeIter iter;
++
++    if(gtk_combo_box_get_active_iter( w, &iter )) {
++        int val = 0;
++        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 0, &val, -1 );
++        torrent_set_int( di, "cheatMode", val );
++    }
++}
++
++static GtkWidget*
++new_cheatMode_combo ( struct DetailsImpl * di )
++{
++    guint tag;
++    int i;
++    GtkWidget * w;
++    GtkCellRenderer * r;
++    GtkListStore * store;
++    const struct {
++        uint8_t value;
++        const char * text;
++    } items[] = {
++        { 0, N_("No Cheat (default)") },
++        { 1, N_("Always Leecher, report 0%") },
++        { 2, N_("Always Seeder, report real up, no down") },
++        { 3, N_("Report real down and up=down*2") }
++    };
++
++    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
++    for( i=0; i<(int)G_N_ELEMENTS(items); i++) {
++        GtkTreeIter iter;
++        gtk_list_store_append( store, &iter );
++        gtk_list_store_set( store, &iter,
++            0, items[i].value,
++            1, _( items[i].text ),
++            -1
++        );
++    }
++    
++    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
++    r = gtk_cell_renderer_text_new( );
++    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
++    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
++    tag = g_signal_connect( w, "changed", G_CALLBACK( onCheatModeChanged ), di );
++    di->cheatModeComboTag = tag;
++
++    g_object_unref( store );
++    return w;
++}
+ 
+ static GtkWidget*
+ options_page_new( struct DetailsImpl * d )
+@@ -540,6 +607,16 @@
+     hig_workarea_add_row( t, &row, _( "Torrent _priority:" ), w, NULL );
+     d->bandwidthCombo = w;
+ 
++    /**/
++
++    w = new_cheatMode_combo( d );
++    hig_workarea_add_section_divider( t, &row );
++    hig_workarea_add_section_title( t, &row, _( "Cheat" ));
++    hig_workarea_add_row( t, &row, _( "Cheat Mode:" ), w, NULL );
++    d->cheatModeCombo = w;
++
++    /**/
++
+     hig_workarea_add_section_divider( t, &row );
+     hig_workarea_add_section_title( t, &row, _( "Seed-Until Ratio" ) );
+ 
+diff -ru transmission-1.76-orig/libtransmission/resume.c transmission-1.76/libtransmission/resume.c
+--- transmission-1.76-orig/libtransmission/resume.c	2009-10-25 02:47:21.000000000 +0100
++++ transmission-1.76/libtransmission/resume.c	2009-10-30 02:16:31.011539131 +0100
+@@ -54,6 +54,7 @@
+ #define KEY_SPEEDLIMIT_UP_MODE     "up-mode"
+ #define KEY_RATIOLIMIT_RATIO       "ratio-limit"
+ #define KEY_RATIOLIMIT_MODE        "ratio-mode"
++#define KEY_CHEATMODE              "cheat-mode"
+ 
+ #define KEY_PROGRESS_MTIMES   "mtimes"
+ #define KEY_PROGRESS_BITFIELD "bitfield"
+@@ -288,6 +289,13 @@
+ }
+ 
+ static void
++saveCheatMode( tr_benc * dict, const tr_torrent * tor )
++{
++    tr_bencDictReserve( dict, 1 );
++    tr_bencDictAddInt( dict, KEY_CHEATMODE, tr_torrentGetCheatMode( tor ) );
++}
++
++static void
+ loadSingleSpeedLimit( tr_benc * d, tr_direction dir, tr_torrent * tor )
+ {
+     int64_t i;
+@@ -369,6 +377,21 @@
+ 
+     return ret;
+ }
++
++static uint64_t
++loadCheatMode( tr_benc * dict, tr_torrent * tor)
++{
++    uint64_t ret = 0;
++    int64_t val;
++ 
++    if( tr_bencDictFindInt( dict, KEY_CHEATMODE, &val ) )
++    {
++        tr_torrentSetCheatMode( tor, (uint8_t) val );
++        ret = TR_FR_CHEATMODE;
++    }
++
++    return ret;
++}
+ /***
+ ****
+ ***/
+@@ -529,6 +552,7 @@
+     saveProgress( &top, tor );
+     saveSpeedLimits( &top, tor );
+     saveRatioLimits( &top, tor );
++    saveCheatMode( &top, tor );
+ 
+     filename = getResumeFilename( tor );
+     tr_bencToFile( &top, TR_FMT_BENC, filename );
+@@ -661,6 +685,9 @@
+     if( fieldsToLoad & TR_FR_RATIOLIMIT )
+         fieldsLoaded |= loadRatioLimits( &top, tor );
+ 
++    if( fieldsToLoad & TR_FR_CHEATMODE )
++        fieldsLoaded |= loadCheatMode( &top, tor );
++
+     /* loading the resume file triggers of a lot of changes,
+      * but none of them needs to trigger a re-saving of the
+      * same resume information... */
+diff -ru transmission-1.76-orig/libtransmission/resume.h transmission-1.76/libtransmission/resume.h
+--- transmission-1.76-orig/libtransmission/resume.h	2009-10-25 02:47:21.000000000 +0100
++++ transmission-1.76/libtransmission/resume.h	2009-10-27 23:37:07.405881479 +0100
+@@ -34,7 +34,8 @@
+     TR_FR_ADDED_DATE          = ( 1 << 12 ),
+     TR_FR_DONE_DATE           = ( 1 << 13 ),
+     TR_FR_ACTIVITY_DATE       = ( 1 << 14 ),
+-    TR_FR_RATIOLIMIT          = ( 1 << 15 )
++    TR_FR_RATIOLIMIT          = ( 1 << 15 ),
++    TR_FR_CHEATMODE           = ( 1 << 16 )
+ };
+ 
+ /**
+diff -ru transmission-1.76-orig/libtransmission/rpcimpl.c transmission-1.76/libtransmission/rpcimpl.c
+--- transmission-1.76-orig/libtransmission/rpcimpl.c	2009-10-25 02:47:21.000000000 +0100
++++ transmission-1.76/libtransmission/rpcimpl.c	2009-10-31 07:01:44.681185379 +0100
+@@ -422,6 +422,8 @@
+         tr_bencDictAddStr( d, key, st->announceURL );
+     else if( tr_streq( key, keylen, "bandwidthPriority" ) )
+         tr_bencDictAddInt( d, key, tr_torrentGetPriority( tor ) );
++    else if( tr_streq( key, keylen, "cheatMode" ) )
++        tr_bencDictAddInt( d, key, tr_torrentGetCheatMode( tor ) );
+     else if( tr_streq( key, keylen, "comment" ) )
+         tr_bencDictAddStr( d, key, inf->comment ? inf->comment : "" );
+     else if( tr_streq( key, keylen, "corruptEver" ) )
+@@ -735,6 +737,9 @@
+         if( tr_bencDictFindInt( args_in, "bandwidthPriority", &tmp ) )
+             if( tr_isPriority( tmp ) )
+                 tr_torrentSetPriority( tor, tmp );
++        if( tr_bencDictFindInt( args_in, "cheatMode", &tmp ) )
++            if( tr_isCheatMode( tmp ) )
++                tr_torrentSetCheatMode( tor, tmp );
+         if( tr_bencDictFindList( args_in, "files-unwanted", &files ) )
+             setFileDLs( tor, FALSE, files );
+         if( tr_bencDictFindList( args_in, "files-wanted", &files ) )
+diff -ru transmission-1.76-orig/libtransmission/torrent.c transmission-1.76/libtransmission/torrent.c
+--- transmission-1.76-orig/libtransmission/torrent.c	2009-10-25 02:47:21.000000000 +0100
++++ transmission-1.76/libtransmission/torrent.c	2009-11-01 02:09:54.936555297 +0100
+@@ -174,6 +174,35 @@
+ ****
+ ***/
+ 
++uint8_t
++tr_isCheatMode( uint8_t mode ) {
++    if( mode <= 3 )
++        return 1;
++    else
++        return 0;
++}
++
++void
++tr_torrentSetCheatMode( tr_torrent * tor, uint8_t mode )
++{
++    assert( tr_isTorrent( tor ) );
++
++    if( mode != tor->cheatMode)
++    {
++        tor->cheatMode = mode;
++
++        tr_torrentSetDirty( tor );
++    }
++}
++
++uint8_t
++tr_torrentGetCheatMode( const tr_torrent * tor )
++{
++    assert( tr_isTorrent( tor ) );
++
++    return tor->cheatMode;
++}
++
+ void
+ tr_torrentSetRatioMode( tr_torrent *  tor, tr_ratiolimit mode )
+ {
+@@ -660,6 +689,13 @@
+         tr_torrentSetRatioLimit( tor, tr_sessionGetRatioLimit( tor->session ) );
+     }
+ 
++    if( !( loaded & TR_FR_CHEATMODE ) )
++    {
++        tr_torrentSetCheatMode( tor, 0 );
++    }
++    // random float, range 0.0 to 0.2
++    tor->cheatRand = (float)tr_cryptoRandInt(200000)/1000000;
++
+     tor->completeness = tr_cpGetStatus( &tor->completion );
+ 
+     tor->tracker = tr_trackerNew( tor );
+diff -ru transmission-1.76-orig/libtransmission/torrent.h transmission-1.76/libtransmission/torrent.h
+--- transmission-1.76-orig/libtransmission/torrent.h	2009-10-25 02:47:21.000000000 +0100
++++ transmission-1.76/libtransmission/torrent.h	2009-11-01 01:37:06.696996026 +0100
+@@ -229,6 +229,9 @@
+     double                     desiredRatio;
+     tr_ratiolimit              ratioLimitMode;
+ 
++    uint8_t                    cheatMode;
++    float                      cheatRand;
++
+     uint64_t                   preVerifyTotal;
+ };
+ 
+diff -ru transmission-1.76-orig/libtransmission/tracker.c transmission-1.76/libtransmission/tracker.c
+--- transmission-1.76-orig/libtransmission/tracker.c	2009-10-25 02:47:21.000000000 +0100
++++ transmission-1.76/libtransmission/tracker.c	2009-11-01 03:19:49.195177464 +0100
+@@ -757,6 +757,54 @@
+ }
+ 
+ static void
++letsCheat( const tr_torrent * tor,
++           uint64_t * up,
++           uint64_t * down,
++           uint64_t * corrupt,
++           uint64_t * left,
++           char ** eventName )
++{
++    uint8_t cheatMode = tr_torrentGetCheatMode( tor );
++
++    if(cheatMode == 0) // no cheat
++    {
++        *up       = tor->uploadedCur;
++        *down     = tor->downloadedCur;
++        *corrupt  = tor->corruptCur;
++        *left     = tr_cpLeftUntilComplete( &tor->completion );
++    }
++    else if(cheatMode == 1) // always leecher
++    {
++        *up       = 0;
++        *down     = 0;
++        *corrupt  = 0;
++        *left     = tor->info.totalSize;
++        if( !strcmp( *eventName, "completed" ) )
++        {
++            *eventName = 0;
++        }
++    }
++    else if(cheatMode == 2) // always seeder, report real upload
++    {
++        *up       = tor->uploadedCur;
++        *down     = 0;
++        *corrupt  = 0;
++        *left     = 0;
++        if( !strcmp( *eventName, "completed" ) )
++        {
++            *eventName = 0;
++        }
++    }
++    else if(cheatMode == 3) // report (download * 1.9 <=> 2.1) upload
++    {
++        *up       = (int64_t)((1.9+tor->cheatRand)*tor->downloadedCur);
++        *down     = tor->downloadedCur;
++        *corrupt  = tor->corruptCur;
++        *left     = tr_cpLeftUntilComplete( &tor->completion );
++    }
++}
++
++static void
+ buildTrackerRequestURI( tr_tracker *       t,
+                         const tr_torrent * torrent,
+                         const char *       eventName,
+@@ -766,6 +814,10 @@
+     const int    numwant = isStopping ? 0 : NUMWANT;
+     const char * ann = getCurrentAddressFromTorrent( t, torrent )->announce;
+ 
++    uint64_t up = 0, down = 0, corrupt = 0, left = 0;
++
++    letsCheat( torrent, &up, &down, &corrupt, &left, (char**)&eventName );
++
+     evbuffer_add_printf( buf, "%cinfo_hash=%s"
+                               "&peer_id=%s"
+                               "&port=%d"
+@@ -781,10 +833,10 @@
+                               t->escaped,
+                               t->peer_id,
+                               tr_sessionGetPeerPort( t->session ),
+-                              torrent->uploadedCur,
+-                              torrent->downloadedCur,
+-                              torrent->corruptCur,
+-                              tr_cpLeftUntilComplete( &torrent->completion ),
++                              up,
++                              down,
++                              corrupt,
++                              left,
+                               numwant,
+                               t->key_param );
+ 
+diff -ru transmission-1.76-orig/libtransmission/transmission.h transmission-1.76/libtransmission/transmission.h
+--- transmission-1.76-orig/libtransmission/transmission.h	2009-10-25 02:47:21.000000000 +0100
++++ transmission-1.76/libtransmission/transmission.h	2009-10-30 02:26:30.951476314 +0100
+@@ -995,6 +995,17 @@
+ 
+ 
+ /****
++*****  Cheat
++****/
++
++uint8_t tr_isCheatMode( uint8_t mode );
++
++void    tr_torrentSetCheatMode( tr_torrent * tor, uint8_t mode );
++
++uint8_t tr_torrentGetCheatMode( const tr_torrent * tor );
++
++
++/****
+ *****  Ratio Limits
+ ****/
+ 
+diff -ru transmission-1.76-orig/web/index.html transmission-1.76/web/index.html
+--- transmission-1.76-orig/web/index.html	2009-10-25 02:48:41.000000000 +0100
++++ transmission-1.76/web/index.html	2009-11-01 02:03:02.100304359 +0100
+@@ -95,6 +95,10 @@
+ 						<div class="inspector_label">Comment:</div>
+ 						<div id="torrent_inspector_comment"></div>
+ 					</div>
++					<div class="inspector_row">
++						<div class="inspector_label">Cheat Mode:</div>
++						<div id="torrent_inspector_cheat_mode"></div>
++					</div>
+ 				</div><!-- class="inspector_group"-->
+ 				
+ 				<div class="inspector_group">
+@@ -364,6 +368,16 @@
+ 				<li class="separator"></li>
+ 				<li id="context_toggle_inspector">Show Inspector</li>
+ 				<li class="separator"></li>
++				<li id="cheatMode">
++					Cheat Mode:
++					<select id="cheatModeSelect">
++					<option value="0">No Cheat (default)</option>
++					<option value="1">Always Leecher, report 0%</option>
++					<option value="2">Always Seeder, report real up, no down</option>
++					<option value="3">Report real down and up=down*2</option>
++					</select>
++				</li>
++				<li class="separator"></li>
+ 				<li id="context_select_all" class="context_select_all">Select All</li>
+ 				<li id="context_deselect_all" class="context_deselect_all">Deselect All</li>
+ 			</ul>
+diff -ru transmission-1.76-orig/web/javascript/torrent.js transmission-1.76/web/javascript/torrent.js
+--- transmission-1.76-orig/web/javascript/torrent.js	2009-10-25 02:48:40.000000000 +0100
++++ transmission-1.76/web/javascript/torrent.js	2009-11-01 02:34:59.366649016 +0100
+@@ -33,7 +33,7 @@
+     'haveUnchecked', 'haveValid', 'leechers', 'leftUntilDone', 'peersConnected',
+     'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
+     'recheckProgress', 'seeders', 'sizeWhenDone', 'status', 'swarmSpeed',
+-    'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode', 'downloadDir' ]
++    'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode', 'downloadDir', 'cheatMode' ]
+ 
+ Torrent.prototype =
+ {
+@@ -224,6 +224,25 @@
+ 			default:                      return -1;
+ 		}
+ 	},
++	cheatMode: function() {
++		return this._cheat_mode;
++	},
++	cheatModeChanged: function(event, newvalue) {
++		to = this;
++		if(newvalue >= 0 && newvalue <= 3) {
++			var o = {
++				method: 'torrent-set',
++				arguments: {
++					ids: this._id,
++					cheatMode: newvalue
++				}
++			};
++
++			this._controller.remote.sendRequest( o, function( data ) {
++				to._controller.refreshTorrents(to._id);
++			});
++		}
++	},
+ 	
+ 	/*--------------------------------------------
+ 	 *
+@@ -335,6 +354,7 @@
+ 		this._total_seeders         = Math.max( 0, data.seeders );
+ 		this._state                 = data.status;
+ 		this._download_dir          = data.downloadDir;
++		this._cheat_mode            = data.cheatMode;
+ 
+ 		if (data.fileStats)
+ 			this.refreshFileModel( data );
+diff -ru transmission-1.76-orig/web/javascript/transmission.js transmission-1.76/web/javascript/transmission.js
+--- transmission-1.76-orig/web/javascript/transmission.js	2009-10-25 02:48:40.000000000 +0100
++++ transmission-1.76/web/javascript/transmission.js	2009-11-01 02:03:45.786833710 +0100
+@@ -81,6 +81,7 @@
+ 		var ti = '#torrent_inspector_';
+ 		this._inspector = { };
+ 		this._inspector._info_tab = { };
++		this._inspector._info_tab.cheat_mode = $(ti+'cheat_mode')[0];
+ 		this._inspector._info_tab.comment = $(ti+'comment')[0];
+ 		this._inspector._info_tab.creator_date = $(ti+'creator_date')[0];
+ 		this._inspector._info_tab.creator = $(ti+'creator')[0];
+@@ -291,8 +292,19 @@
+ 			onContextMenu:     function(e) {
+ 				tr.setSelectedTorrent( $(e.target).closest('.torrent')[0]._torrent, true );
+ 				return true;
++			},
++			onShowMenu:        function(e, menu) {
++				cheatMode = tr.getSelectedTorrents()[0].cheatMode();
++				option = $('#cheatModeSelect option[value='+cheatMode+']', menu);
++				if(typeof option.attr == 'function')
++					option.attr("selected", "selected");
++				return menu;
+ 			}
+ 		});
++		$('#cheatModeSelect').change(function(e) {
++			selectedTorrent = tr.getSelectedTorrents()[0];
++			selectedTorrent.cheatModeChanged(e, e.target.selectedIndex);
++		});
+ 	},
+ 
+ 	/*
+@@ -926,6 +938,7 @@
+ 		var date_created = 'N/A';
+ 		var error = '';
+ 		var hash = 'N/A';
++		var cheat_mode = 'N/A';
+ 		var have_public = false;
+ 		var have_private = false;
+ 		var name;
+@@ -956,6 +969,7 @@
+ 			setInnerHTML( tab.name, 'No Selection' );
+ 			setInnerHTML( tab.size, na );
+ 			setInnerHTML( tab.tracker, na );
++			setInnerHTML( tab.cheat_mode, na );
+ 			setInnerHTML( tab.hash, na );
+ 			setInnerHTML( tab.state, na );
+ 			setInnerHTML( tab.download_speed, na );
+@@ -998,6 +1012,22 @@
+ 				download_dir = t._download_dir;
+ 
+ 			hash = t.hash();
++			switch( t.cheatMode() ) {
++				case 0:
++					cheat_mode = "No Cheat (default)";
++				break;
++				case 1:
++					cheat_mode = "Always Leecher, report 0%";
++				break;
++				case 2:
++					cheat_mode = "Always Seeder, report real up, no down";
++				break;
++				case 3:
++					cheat_mode = "Report real down and up=down*2";
++				break;
++				default:
++					cheat_mode = "???";
++			}
+ 			date_created = Math.formatTimestamp( t._creator_date );
+ 		}
+ 
+@@ -1039,6 +1069,7 @@
+ 		setInnerHTML( tab.name, name );
+ 		setInnerHTML( tab.size, torrents.length ? Math.formatBytes( total_size ) : na );
+ 		setInnerHTML( tab.tracker, total_tracker.replace(/\//g, '/&#8203;') );
++		setInnerHTML( tab.cheat_mode, cheat_mode );
+ 		setInnerHTML( tab.hash, hash );
+ 		setInnerHTML( tab.state, total_state );
+ 		setInnerHTML( tab.download_speed, torrents.length ? Math.formatBytes( total_download_speed ) + '/s' : na );

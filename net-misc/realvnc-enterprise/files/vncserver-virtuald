@@ -1,0 +1,18 @@
+#!/sbin/runscript
+# Copyright 1999-2012 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header:  axs Exp $
+
+start() {
+	ebegin "Starting VNC-server virtuald"
+	/usr/bin/vncserver-virtuald
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping VNC-server virtuald"
+	start-stop-daemon --stop --quiet --pidfile /var/run/vncserver-virtuald.pid
+	eend $?
+}
+
+

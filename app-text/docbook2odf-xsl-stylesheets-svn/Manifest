@@ -1,0 +1,7 @@
+EBUILD docbook2odf-xsl-stylesheets-svn-0.244.ebuild 989 RMD160 ea4990c08d16001b42e01ce136121836d0460080 SHA1 a7101320254ec29f335fba7697dc08e27ee39000 SHA256 3518459baa2fe36ef40e72268bde6578b43f7dfa326dd8d1bf60c9706ed6ebfa
+MD5 1c110a32ab11510da00789e6e7ccf521 docbook2odf-xsl-stylesheets-svn-0.244.ebuild 989
+RMD160 ea4990c08d16001b42e01ce136121836d0460080 docbook2odf-xsl-stylesheets-svn-0.244.ebuild 989
+SHA256 3518459baa2fe36ef40e72268bde6578b43f7dfa326dd8d1bf60c9706ed6ebfa docbook2odf-xsl-stylesheets-svn-0.244.ebuild 989
+MD5 d41d8cd98f00b204e9800998ecf8427e files/digest-docbook2odf-xsl-stylesheets-svn-0.244 0
+RMD160 9c1185a5c5e9fc54612808977ee8f548b2258d31 files/digest-docbook2odf-xsl-stylesheets-svn-0.244 0
+SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 files/digest-docbook2odf-xsl-stylesheets-svn-0.244 0

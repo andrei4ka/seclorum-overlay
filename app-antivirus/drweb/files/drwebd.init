@@ -1,0 +1,36 @@
+#!/sbin/runscript
+#
+# Dr.Web Gentoo init script
+#
+
+PID=/var/drweb/run/drwebd.pid
+SCVNAME="DrWeb daemon"
+
+depend() {
+        need net
+}
+ 
+start() {
+       ebegin "Starting ${SVCNAME}"
+       start-stop-daemon --quiet --start --pidfile ${PID} --exec /opt/drweb/drwebd -- -ini=${INIFILE}
+       eend $? "Failed to start ${SVCNAME}"
+}
+
+stop() {
+       ebegin "Stopping ${SVCNAME}"
+       start-stop-daemon --quiet --stop --pidfile ${PID}
+       eend $? "Failed to stop ${SVCNAME}"
+}
+
+reload() {
+	ebegin "Reloading ${SVCNAME} ..."
+	    if [[ -f ${PID} ]] ; then
+    		    kill -HUP `head -1 ${PID}`
+	    fi
+	eend $?
+}
+restart() {
+	svc_stop
+	sleep 2
+	svc_start
+}

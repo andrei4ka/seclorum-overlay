@@ -1,0 +1,48 @@
+diff -Naur netams.orig/addon/index.html netams/addon/index.html
+--- netams.orig/addon/index.html	2009-11-29 23:14:19 +0300
++++ netams/addon/index.html	2009-11-29 23:15:39 +0300
+@@ -11,7 +11,7 @@
+ <tr align="center" valign="middle"><td align="center" valign="middle">
+ <table width=380 cellpadding=0 cellspacing=0 border=0>
+ <tr align=center>
+-<td align=center><img src="images/logo_sm.jpg" width=376 height=60 alt="" border="0"><br><br></td></tr>
++<td align=center><img src="stat/images/logo_sm.jpg" width=376 height=60 alt="" border="0"><br><br></td></tr>
+ <tr align=left>
+ <td><br><center><h3>You will be redirected soon...</h3></center><br>
+ <ul>
+diff -Naur netams.orig/cgi-bin/admin/netams.cgi netams/cgi-bin/admin/netams.cgi
+--- netams.orig/cgi-bin/admin/netams.cgi	2009-11-29 22:48:57 +0300
++++ netams/cgi-bin/admin/netams.cgi	2009-11-29 23:26:56 +0300
+@@ -16,7 +16,7 @@
+ $action=$cgi->param("action");
+ 
+ $tem_h = '<html><head><title>NeTAMS Admintool</title></head><body bgcolor="#ffffff"><table width=100% cellpadding=3 cellspacing=0 border=0>
+-<tr align=left><td valign=middle><font face="tahoma,verdana, sans serif" size=+2><b>NeTAMS Admintool</b></font><br><b>'.$L_version.':</b> %%NETAMS_VERSION%%<br><b>'.$L_runtime.':</b> %%NETAMS_TIME%%<br><b>'.$L_nowtime.':</b> %%NOW_TIME%%</td><td width=376 align=right valign=top><img src="../../images/logo_sm.jpg" width=376 height=60></td></tr><tr><td colspan=2 align=left width=100% height=2 bgcolor=#cccccc></td></tr></table>
++<tr align=left><td valign=middle><font face="tahoma,verdana, sans serif" size=+2><b>NeTAMS Admintool</b></font><br><b>'.$L_version.':</b> %%NETAMS_VERSION%%<br><b>'.$L_runtime.':</b> %%NETAMS_TIME%%<br><b>'.$L_nowtime.':</b> %%NOW_TIME%%</td><td width=376 align=right valign=top><img src="../../stat/images/logo_sm.jpg" width=376 height=60></td></tr><tr><td colspan=2 align=left width=100% height=2 bgcolor=#cccccc></td></tr></table>
+ <table width=100% cellpadding=3 cellspacing=0 border=0><tr><td bgcolor=#eeeeee width=110 colspan=2></td><td bgcolor=#eeeeee width=100% align=left>%%TOP_PANE%%</td></tr><tr><td colspan=3 align=left width=100% height=2 bgcolor=#cccccc></td></tr><tr valign=top><td align=center bgcolor=#cccccc width=100>%%LEFT_PANE%%</td><td bgcolor=white width=10> </td><td bgcolor=white>%%RIGHT_PANE%%</td></tr>';
+ $tem_f = '</body></html>';
+ 
+diff -Naur netams.orig/cgi-bin/admin/statistic.cgi netams/cgi-bin/admin/statistic.cgi
+--- netams.orig/cgi-bin/admin/statistic.cgi	2009-11-29 22:48:57 +0300
++++ netams/cgi-bin/admin/statistic.cgi	2009-11-29 23:27:18 +0300
+@@ -13,7 +13,7 @@
+ $url		= "statistic.cgi";
+ $url_graph	= "../netams_graph.cgi";
+ $url_html	= "../netams_html.cgi";
+-$images		= "../../images";
++$images		= "../../stat/images";
+ $show_null	= "no";
+ $insert_href	= "yes";
+ 
+diff -Naur netams.orig/cgi-bin/login.cgi netams/cgi-bin/login.cgi
+--- netams.orig/cgi-bin/login.cgi	2009-11-29 23:14:54 +0300
++++ netams/cgi-bin/login.cgi	2009-11-29 23:27:30 +0300
+@@ -29,7 +29,7 @@
+ <body bgcolor="#ffffff" topmargin="0" marginheight="0" marginwidth="0" leftmargin="0"> 
+ <div align=center><form action="login.cgi" method=post> 
+ <table width=700 align=center border=1 cellpadding=0 cellspacing=0> 
+-<tr align=center><td width=100%><img src="../images/logo_sm.jpg" width=376 height=60 alt="" border="0" align=left> 
++<tr align=center><td width=100%><img src="../stat/images/logo_sm.jpg" width=376 height=60 alt="" border="0" align=left> 
+ <font size=+2 face="tahoma, arial" color=black><strong>Авторизация</strong></font><br> 
+ <font size=-1 face="tahoma, arial" color=blue>вызывается с адреса: <strong>%%FROM%%</strong></font></td></tr> 
+ <tr bgcolor=white align=center><td><br> ';

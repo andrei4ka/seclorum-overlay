@@ -1,0 +1,2 @@
+AW_COMMON=/opt/aw
+MAYA_LOCATION=${AW_COMMON}/maya

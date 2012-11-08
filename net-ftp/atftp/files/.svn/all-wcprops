@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files
+END
+atftp.init
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftp.init
+END
+atftp-0.6-security.patch
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftp-0.6-security.patch
+END
+atftp-0.7-glibc24.patch
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftp-0.7-glibc24.patch
+END
+atftpd-filecase.diff
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftpd-filecase.diff
+END
+atftp-0.7-pcre.patch
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftp-0.7-pcre.patch
+END
+atftp.confd
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftp.confd
+END
+atftp-0.7-gcc.patch
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftp-0.7-gcc.patch
+END
+atftp-0.7-password.patch
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftp-0.7-password.patch
+END
+atftp-0.7-tests.patch
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/linamh/!svn/ver/886/trunk/mds/net-ftp/atftp/files/atftp-0.7-tests.patch
+END

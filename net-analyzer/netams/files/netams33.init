@@ -1,0 +1,25 @@
+#!/sbin/runscript
+# $Id: netams-gentoo.sh,v 1.1 2005/06/07 20:20:37 anton Exp $
+# this is Linux Gentoo version
+
+start() {
+    ebegin "Starting NeTAMS"
+    if [ -f /etc/netams.cfg ]; then
+        start-stop-daemon --start --quiet --background \
+	    --pid /var/run/netams.pid \
+	    --exec /usr/sbin/netams -- -f /etc/netams.cfg -l
+     fi
+    eend $? "Failed to start NeTAMS"
+}
+
+stop() {
+    ebegin "Stopping netams"
+    start-stop-daemon --stop --quiet --pid /var/run/netams.pid --exec /usr/sbin/netams
+    eend $? "Failed to stop NeTAMS"
+}
+
+restart() {
+    svc_stop
+    sleep 3
+    svc_start
+}

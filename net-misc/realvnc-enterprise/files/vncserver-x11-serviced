@@ -1,0 +1,18 @@
+#!/sbin/runscript
+# Copyright 1999-2012 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/app-misc/lirc/files/lircd-0.8.6-r2,v 1.1 2012/07/19 19:52:17 axs Exp $
+XAUTHLOCALHOSTNAME=localhost
+export XAUTHLOCALHOSTNAME
+
+start() {
+	ebegin "Starting VNC-server X11"
+	/usr/bin/vncserver-x11-serviced
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping VNC-server X11"
+	start-stop-daemon --stop --quiet --pidfile /var/run/vncserver-x11-serviced.pid
+	eend $?
+}

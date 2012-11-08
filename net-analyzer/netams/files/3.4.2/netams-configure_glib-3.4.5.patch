@@ -1,0 +1,12 @@
+diff -ur netams/configure.sh netams.new/configure.sh
+--- netams/configure.sh	2010-12-06 15:39:42 +0000
++++ netams.new/configure.sh	2010-12-06 15:42:46 +0000
+@@ -12,7 +12,7 @@
+  /usr/local/include/mysql /usr/local/include /usr/include /usr/include/mysql /usr/local/mysql4/include/mysql \
+  /opt/csw/include /usr/pkg/include/mysql /usr/pkg/lib/mysql $ORACLE_HOME/lib32 $ORACLE_HOME/lib /usr/include/libipq \
+  /usr/pkg/include /usr/pkg/lib /usr/lib64/mysql /usr/lib64 /usr/include/pgsql /usr/include/libnetfilter_queue \
+- /usr/include/glib-2.0 /usr/lib/glib-2.0/include"
++ /usr/include/glib-2.0 /usr/lib/glib-2.0/include /usr/lib64/glib-2.0/include"
+ 
+ locate_file() {
+ 	for val in $paths

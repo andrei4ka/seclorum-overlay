@@ -1,0 +1,34 @@
+--- configure.sh.orig	2009-02-08 11:55:41 +0300
++++ configure.sh	2009-02-08 11:56:23 +0300
+@@ -11,7 +11,7 @@
+ paths="/usr/lib /usr/local/lib /usr/lib/mysql /usr/local/lib/mysql /usr/local/mysql4/lib/mysql \
+  /usr/local/include/mysql /usr/local/include /usr/include /usr/include/mysql /usr/local/mysql4/include/mysql \
+  /opt/csw/include /usr/pkg/include/mysql /usr/pkg/lib/mysql $ORACLE_HOME/lib32 $ORACLE_HOME/lib /usr/include/libipq \
+- /usr/pkg/include /usr/pkg/lib /usr/lib64/mysql /usr/lib64 /usr/include/postgresql /usr/include/libnetfilter_queue \
++ /usr/pkg/include /usr/pkg/lib /usr/lib64/mysql /usr/lib64 /usr/include/pgsql /usr/include/libnetfilter_queue \
+  /usr/include/glib-2.0 /usr/lib/glib-2.0/include"
+
+ locate_file() {
+@@ -129,15 +129,15 @@ echo "INSTALL = /usr/bin/install" >> $ma
+ #paths
+ echo "PATH_TO_ETC=/etc" >> $makefile
+ echo "PATH_TO_WWW=/var/www/netams" >> $makefile
+-echo "PATH_TO_CONFIG=/etc" >> $makefile
+-echo "PATH_TO_LOG=/var/log/netams.log" >> $makefile
+-echo "PATH_TO_SCRIPTS=/etc/init.d" >> $makefile
+-echo "DAEMONDIR=/usr/local/sbin"  >> $makefile
+-echo "SBINDIR=/usr/local/sbin"	>> $makefile
+-echo "MANDIR=/usr/local/man"  >> $makefile
++echo "PATH_TO_CONFIG=/etc/netams/netams.conf" >> $makefile
++echo "PATH_TO_LOG=/var/log/netams/netams.log" >> $makefile
++echo "PATH_TO_SCRIPTS=/etc/rc.d/init.d" >> $makefile
++echo "DAEMONDIR=/usr/sbin"  >> $makefile
++echo "SBINDIR=/usr/sbin"	>> $makefile
++echo "MANDIR=/usr/share/man"  >> $makefile
+ 
+ #ipq
+-locate_file "libipq.a" && v1=$var && locate_file "libnetfilter_queue_libipq.a" && v3=$var && locate_file "libipq.h" && v2=$var
++locate_file "libipq.so" && v1=$var && locate_file "libnetfilter_queue_libipq.a" && v3=$var && locate_file "libipq.h" && v2=$var
+ if [ "X$v1$v3" != "X" -a "X$v2" != "X" ]; then
+ 	echo "Will have LIBIPQ support"
+ 	if [ -e /sbin/iptables ]; then

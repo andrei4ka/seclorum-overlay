@@ -1,0 +1,10 @@
+# Rsyslog logrotate snippet for Gentoo Linux
+# contributed by Guillaume ZITTA
+#
+
+/var/log/*.log /var/log/messages {
+    sharedscripts
+    postrotate
+        /etc/init.d/rsyslogd reload > /dev/null 2>&1 || true
+    endscript
+}

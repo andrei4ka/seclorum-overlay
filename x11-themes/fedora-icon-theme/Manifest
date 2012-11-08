@@ -1,0 +1,8 @@
+DIST fedora-icon-theme-1.0.0-1.fc8.src.rpm 218391 RMD160 8e9b6fb43ee1525676e1271ad21ef25ca51383cc SHA1 378cff29b8bd48f2cabd2594c22aafc7c8497af7 SHA256 abd4dedf42de785e346e3c326bc23cac7a207f62adb43e0e52b9aa80dbbdf8d5
+EBUILD fedora-icon-theme-1.0.0.ebuild 920 RMD160 cd6782e8f4922bccadd625a47ae95e55c45910f6 SHA1 a6289cc1b61d857c968841f5c3ba85d55a5b65b1 SHA256 23a1b4aaba41b760ef40b65aa70ebb5549df4e9b5fb5faf0eda24e5715223bb5
+MD5 29111da848ec8dca8eaeb9bf9d6fc67c fedora-icon-theme-1.0.0.ebuild 920
+RMD160 cd6782e8f4922bccadd625a47ae95e55c45910f6 fedora-icon-theme-1.0.0.ebuild 920
+SHA256 23a1b4aaba41b760ef40b65aa70ebb5549df4e9b5fb5faf0eda24e5715223bb5 fedora-icon-theme-1.0.0.ebuild 920
+MD5 f640ff98d07800f11f84442ef42e6c72 files/digest-fedora-icon-theme-1.0.0 292
+RMD160 e84a0a67d1304629599d53f7fdfaea82acab2229 files/digest-fedora-icon-theme-1.0.0 292
+SHA256 9a37a1c933552b3dd531bbed35a933b803e7745a62d81cbae8950e4a992e4624 files/digest-fedora-icon-theme-1.0.0 292

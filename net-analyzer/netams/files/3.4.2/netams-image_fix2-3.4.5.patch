@@ -1,0 +1,57 @@
+diff --git a/netams/src/html.c b/netams/src/html.c
+index f89fc96..ec80698 100644
+--- a/netams/src/html.c
++++ b/netams/src/html.c
+@@ -689,7 +689,7 @@ void sHPrintHeader(FILE *f, const char *title, const char *back, const char *log
+ 		<A href=\"http://www.netams.com/index.html\"> \n\
+ 		<img src=\"%s/images/logo_sm.jpg\" width=376 height=60 border=0></a></td> \n\
+ 		<td valign=middle align=left width=80%%> %s	<a href=\"http://www.netams.com/index.html\"><b>NeTAMS</b></a><br> \
+-		<b>%s: </b>", title, language_charset_str[lang], logopath?logopath:"../../../../..", logopath?logopath:"../../../../..", Locale(LC_H_REPORT), Locale(LC_H_SW_VERSION));
++		<b>%s: </b>", title, language_charset_str[lang], logopath?logopath:"../../../../../stat", logopath?logopath:"../../../../..", Locale(LC_H_REPORT), Locale(LC_H_SW_VERSION));
+ 	fprintf(f, "%s<br>\n", SHOW_VERSION);
+ 
+ 	char buff[32];
+@@ -784,7 +784,7 @@ void sHPrintUnitsTree(FILE *f, Service_Html *cfg, NetUnit *u, u_char isadmintool
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%06X&policy=%s&year=%u&month=%u\">M</a>", u->id, tmp, tm.tm_year+1900, tm.tm_mon+1);
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%06X&policy=%s&year=%u\">Y</a>", u->id, tmp, tm.tm_year+1900);
+ 		    if (isadmintool) fprintf(f, "<A href=\"../../../../../cgi-bin/admin/graph.cgi?action=form_view&urls=@oid=%06X@policy=%s@year=%u@month=%u@day=%u@inout=both\">", u->id, tmp, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday );
+-		    fprintf(f, "<img src=\"../../../../../images/rrdgraph-logo.gif\" width=20 height=20 border=1 align=absmiddle>");
++		    fprintf(f, "<img src=\"../../../../../stat/images/rrdgraph-logo.gif\" width=20 height=20 border=1 align=absmiddle>");
+ 		    if (isadmintool) fprintf(f, "</a>" );
+ 		    fprintf(f, "&nbsp;&nbsp;");
+ 
+@@ -807,14 +807,14 @@ void sHPrintUnitsTree(FILE *f, Service_Html *cfg, NetUnit *u, u_char isadmintool
+ 		fprintf(f, "</table><br>\n");
+     } else {
+ 		fprintf(f, "<tr bgcolor='#ffffcc' id='%06X'><td colspan=11>", u->id);
+-		if (isadmintool) fprintf(f, "<A href=\"../../../../../cgi-bin/admintool.cgi?oid=%06X\"><img src=\"../../../../../images/admintool-logo.gif\" width=20 height=20 border=1 align=absmiddle></a> ", u->id);
++		if (isadmintool) fprintf(f, "<A href=\"../../../../../cgi-bin/admintool.cgi?oid=%06X\"><img src=\"../../../../../stat/images/admintool-logo.gif\" width=20 height=20 border=1 align=absmiddle></a> ", u->id);
+ 		if (!is_zero_counters && *tmp) {
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%06X&policy=%s&year=%u&month=%u&day=%u\">D</a>", u->id, tmp, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday);
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%06X&policy=%s&year=%u&week=d2w-%u-%u-%u\">W</a>", u->id, tmp, tm.tm_year+1900, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday);
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%06X&policy=%s&year=%u&month=%u\">M</a>", u->id, tmp, tm.tm_year+1900, tm.tm_mon+1);
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%06X&policy=%s&year=%u\">Y</a>", u->id, tmp, tm.tm_year+1900);
+ 		    if (isadmintool) fprintf(f, "<A href=\"../../../../../cgi-bin/admin/graph.cgi?action=form_view&urls=@oid=%06X@policy=%s@year=%u@month=%u@day=%u@inout=both\">", u->id, tmp, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday );
+-		    fprintf(f, "<img src=\"../../../../../images/rrdgraph-logo.gif\" width=20 height=20 border=1 align=absmiddle>");
++		    fprintf(f, "<img src=\"../../../../../stat/images/rrdgraph-logo.gif\" width=20 height=20 border=1 align=absmiddle>");
+ 		    if (isadmintool) fprintf(f, "</a>" );
+ 		    fprintf(f, "&nbsp;&nbsp;");
+ 		}
+@@ -845,7 +845,7 @@ void sHPrintUnitsTree(FILE *f, Service_Html *cfg, NetUnit *u, u_char isadmintool
+ 			}
+ 			netams_rwlock_unlock(&u->ap->rwlock);
+ 
+-			if (p) fprintf(f, "&nbsp;<A href=\"%s/NetamsView/netams?action=table&unit_oid=%d&policies_oids=%s&time_from=%ld000&time_to=%ld000&timespan=M\"><img src=\"../../../../../images/showtable-logo.gif\" width=20 height=20 border=1 align=absmiddle></a>", cfg->servlet_url, u->id, p, now, now);
++			if (p) fprintf(f, "&nbsp;<A href=\"%s/NetamsView/netams?action=table&unit_oid=%d&policies_oids=%s&time_from=%ld000&time_to=%ld000&timespan=M\"><img src=\"../../../../../stat/images/showtable-logo.gif\" width=20 height=20 border=1 align=absmiddle></a>", cfg->servlet_url, u->id, p, now, now);
+ 			aFree(p);
+ 		}
+ 
+@@ -872,7 +872,7 @@ void sHPrintUnitST(FILE *f, NetUnit *u, const char *unit_list){
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%s&policy=%06X&year=%u&week=d2w-%u-%u-%u&oids=unit\">W</a>", unit_list, cpd->policy->id, tm.tm_year+1900, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday);
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%s&policy=%06X&year=%u&month=%u&oids=unit\">M</a>", unit_list, cpd->policy->id, tm.tm_year+1900, tm.tm_mon+1);
+ 		    fprintf(f, "<A href=\"../../../../../cgi-bin/netams_graph.cgi?oid=%s&policy=%06X&year=%u&oids=unit\">Y</a>", unit_list, cpd->policy->id, tm.tm_year+1900);
+-		    fprintf(f, "<img src=\"../../../../../images/rrdgraph-logo.gif\" width=20 height=20 border=1 align=absmiddle>");
++		    fprintf(f, "<img src=\"../../../../../stat/images/rrdgraph-logo.gif\" width=20 height=20 border=1 align=absmiddle>");
+ 		    fprintf(f, "&nbsp;&nbsp;");
+ 		    fprintf(f, "%s</td>\n", cpd->policy->name?cpd->policy->name:"<\?\?>");
+ 		} else

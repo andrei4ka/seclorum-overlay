@@ -1,0 +1,55 @@
+8
+
+dir
+12
+https://svn.keksbude.net/repos/keks-overlay/dev-perl/Linux-Inotify2
+https://svn.keksbude.net/repos/keks-overlay
+
+
+
+2007-10-02T10:31:53.913284Z
+1
+root
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+76c7012c-beb6-497c-9295-8f62324a2751
+
+Linux-Inotify2-1.1.ebuild
+file
+
+
+
+
+2007-11-03T14:48:46.000000Z
+c285dd5715876d4a3b5dfedce1ba3e1c
+2007-10-02T10:31:53.913284Z
+1
+root
+
+files
+dir
+
+Manifest
+file
+
+
+
+
+2007-11-03T14:48:46.000000Z
+8e6251f5b37454f7c33f9dbb1c6f685f
+2007-10-02T10:31:53.913284Z
+1
+root
+

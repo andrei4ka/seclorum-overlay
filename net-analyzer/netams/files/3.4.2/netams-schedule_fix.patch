@@ -1,0 +1,20 @@
+diff -Naur netams-3.4.0rc2.old/src/common.c netams-3.4.0rc2/src/common.c
+--- netams-3.4.0rc2.old/src/common.c	2007-12-27 01:30:06 +0300
++++ netams-3.4.0rc2/src/common.c	2007-12-27 02:48:15 +0300
+@@ -1009,11 +1009,15 @@
+ 	if(!sSched) {
+ 		if(no_flag) return CLI_OK;
+ 		cli_set_configmode(CLI, MODE_CONFIG, NULL);
+-		cli_run_command(CLI, "service scheduler");
++		cli_run_command(CLI, "service scheduler 0");
+ 		sSched->Start();
+ 	}
+ 	//remove schedule world
+ 	argc--;
++	if (argc == 0) {
++		cli_error(cli, "no commands to schedule");
++		return -1;
++	}
+ 	argv=&argv[1];
+ 	return sSched->ProcessCfg(cli, argv, argc, no_flag);
+ }

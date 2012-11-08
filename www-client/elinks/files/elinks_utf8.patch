@@ -1,0 +1,15 @@
+--- a/src/intl/charsets.c
++++ b/src/intl/charsets.c
+@@ -269,9 +269,10 @@ get_translation_table_to_utf_8(int from)
+ 	if (from == -1) return NULL;
+ 	from &= ~SYSTEM_CHARSET_FLAG;
+ 	if (from == lfr) return utf_table;
+-	if (utf_table_init)
+-		memset(utf_table, 0, sizeof(utf_table)),
++	if (utf_table_init) {
++		memset(utf_table, 0, sizeof(utf_table));
+ 		utf_table_init = 0;
++	}
+ 	else
+ 		free_utf_table();
+

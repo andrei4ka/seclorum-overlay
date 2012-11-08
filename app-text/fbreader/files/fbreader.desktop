@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=FBReader
+Comment=FictionBook file
+Icon=fbreader
+Exec=fbreader %f
+MimeType=application/x-fb2;application/chm;text/rtf;
+Terminal=false
+Type=Application
+Categories=Application;Office;Viewer;

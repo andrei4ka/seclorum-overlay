@@ -1,0 +1,6 @@
+[Desktop Entry]
+Comment=FictionBook file
+Icon=fbreader
+MimeType=application/x-fb2
+Patterns=*.fb2;*.fb2.zip;
+Type=MimeType

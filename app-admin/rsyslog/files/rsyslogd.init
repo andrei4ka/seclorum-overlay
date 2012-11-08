@@ -1,0 +1,89 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+opts="start stop reload"
+
+pidfile=/var/run/rsyslogd.pid
+binpath=/usr/sbin/rsyslogd
+
+checkconfig() {
+	if [ ! -x $binpath ] ; then 
+		eerror "$binpath doesn\'t exist or isn\'t executable"
+	fi
+	if [ ! -e /etc/rsyslog.conf ] ; then
+		eerror "/etc/rsyslog.conf not found"
+	fi
+}
+
+create_xconsole()
+{
+    if [ ! -e /dev/xconsole ]; then
+	mknod -m 640 /dev/xconsole p
+    else
+	chmod 0640 /dev/xconsole
+    fi
+    chown root:wheel /dev/xconsole
+}
+
+running()
+{
+    # No pidfile, probably no daemon present
+    #
+    if [ ! -f $pidfile ]
+    then
+	eerror "No pid file"
+	return 1
+    fi
+
+    pid=`cat $pidfile`
+
+    # No pid, probably no daemon present
+    #
+    if [ -z "$pid" ]
+    then
+	eerror "Empty pid file"
+	return 1
+    fi
+
+    cmd=`cat /proc/$pid/cmdline | tr "\000" "\n"|head -n 1`
+
+    # No syslogd?
+    #
+    if [ "$cmd" != "$binpath" ]
+    then
+	eerror "pid found but no process found"
+	return 1
+    fi
+
+    return 0
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting system log daemon: rsyslogd"
+	create_xconsole
+    	start-stop-daemon --start --quiet --exec $binpath -- $SYSLOGD_OPTIONS
+	eend $? "Failed to start rsyslog"
+}
+
+stop() {
+	ebegin "Stopping system log daemon: rsyslogd"
+	start-stop-daemon --stop --exec $binpath --pidfile $pidfile
+	eend $? "Failed to stop rsyslog"
+	sleep 1 # needed for rsyslog to stop in case we're restarting
+}
+
+reload() {
+	checkconfig || return 1
+	ebegin "Reloading configuration and re-opening log files"
+	if running
+    	then
+        	start-stop-daemon --stop --quiet --signal 1 --exec $binpath --pidfile $pidfile
+	eend $?
+    	else
+        	eerror "rsyslog isn't running"
+	eend 1
+	fi
+}
+

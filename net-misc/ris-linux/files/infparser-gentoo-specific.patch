@@ -1,0 +1,46 @@
+--- ./infparser.py.old	2009-04-23 14:47:32.000000000 +0400
++++ ./infparser.py	2009-04-23 14:47:44.000000000 +0400
+@@ -289,14 +289,22 @@
+ 
+ 
+ if __name__ == '__main__':
+-    if len(argv) != 2:
+-        print 'Usage %s: directory_with_infs or inf file' % argv[0]
+-        sys_exit(-1)
++    if len(argv) != 3:
++        devlist_path = "/var/lib/ris-linux/"
++        inf_path = "/usr/share/ris-linux/lan-drivers/inf"
++        print 'Usage %s: /path/to/inf/files /path/to/devlist_cache' % argv[0]
++        print ' '
++        print 'No argumen given. The script will be use default values:'
++        print 'Inf-files path: %s' % inf_path
++        print 'Devlist.cache path %s' % devlist_path
++    else:
++        devlist_path = argv[2]
++        inf_path = argv[1]
+ 
+-    if isfile(argv[1]):
+-        filelist = [ argv[1] ]
++    if isfile(inf_path):
++        filelist = [ inf_path ]
+     else:
+-        filelist = glob(argv[1] + '/*.inf')
++        filelist = glob(inf_path + '/*.inf')
+ 
+     devlist = {}
+     for inffile in filelist:
+@@ -314,12 +322,12 @@
+ 
+     print 'Compiled %d drivers' % len(devlist)
+ 
+-    fd = open('devlist.cache', 'wb')
++    fd = open(devlist_path + '/devlist.cache', 'wb')
+     dump(devlist, fd)
+     fd.close()
+     print 'generated devlist.cache'
+ 
+-    fd = open('nics.txt', 'w')
++    fd = open(devlist_path + 'nics.txt', 'w')
+     drvhash = {}
+     for nic in devlist.items():
+         entry = nic[0].split('&')

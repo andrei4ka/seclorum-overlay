@@ -1,0 +1,96 @@
+diff -dPNur netams-3.2.3/src/policy.c netams-3.2.3-ranges/src/policy.c
+--- netams-3.2.3/src/policy.c	2005-02-24 11:58:13.000000000 +0100
++++ netams-3.2.3-ranges/src/policy.c	2005-07-25 23:52:32.000000000 +0200
+@@ -32,6 +32,8 @@
+ 	target.num_ports=0;
+ 	for (u_char i=0; i<PC_MAX_PORTS; i++)
+ 		target.src_ports[i]=target.dst_ports[i]=0;
++	for (u_char i=0; i<PC_MAX_PORTS; i++)
++		target.max_ports[i]=0;
+ 
+ 	target.num_addrs=0;
+ 	for (u_char i=0; i<PC_MAX_ADDRS; i++) 
+@@ -171,6 +173,8 @@
+ 				target.check_type|=PC_IP_PORTS;
+ 			u_char j=0;
+ 			u_short ports;
++			u_short max_port;
++			char *maxptr;
+ 			char *ptr;
+ 			
+ 			while (tgt[j+*i+1]!=empty && j<PC_MAX_PORTS) {
+@@ -179,9 +183,19 @@
+ 				else 
+ 					ptr=tgt[j+*i+1];
+ 				
++				
++				maxptr = strchr(ptr,':');
++				if (!maxptr) maxptr = strchr(ptr,'-');
++
+ 				ports=strtol(ptr, NULL, 10);
+ 
+ 				if (!ports) break;
++
++				if (maxptr) {
++				    max_port = strtol(maxptr+1, NULL, 10);
++				    if (ports>max_port) max_port = 0;
++				} else max_port = 0;
++				target.max_ports[j] = htons(max_port);
+ 				
+ 				switch (tgt[j+*i+1][0]) {
+ 					case 's':
+@@ -358,11 +372,26 @@
+ 			if(target.num_ports) sprintf(buf+strlen(buf), "ports ");
+ 			for (u_char i=0; i<target.num_ports; i++) {
+ 				if (target.src_ports[i]==target.dst_ports[i]) 
++				{
++				    if (target.max_ports[i])
++					sprintf(buf+strlen(buf), "%u:%u ", ntohs(target.src_ports[i]),  ntohs(target.max_ports[i]));
++				    else
+ 					sprintf(buf+strlen(buf), "%u ", ntohs(target.src_ports[i]));
++				}
+ 				else if (target.src_ports[i])
++				{
++				    if (target.max_ports[i])
++					sprintf(buf+strlen(buf), "s%u:%u ", ntohs(target.src_ports[i]),  ntohs(target.max_ports[i]));
++				    else
+ 					sprintf(buf+strlen(buf), "s%u ", ntohs(target.src_ports[i]));
++				}
+ 				else if (target.dst_ports[i]) 
++				{
++				    if (target.max_ports[i])
++					sprintf(buf+strlen(buf), "d%u:%u ", ntohs(target.dst_ports[i]),ntohs(target.max_ports[i]));
++				    else
+ 					sprintf(buf+strlen(buf), "d%u ", ntohs(target.dst_ports[i]));
++				}
+ 			} 
+ 		}
+ 		if (target.check_type&PC_UNIT) {
+@@ -436,6 +465,15 @@
+ 					res=1;
+ 					break;
+ 				}
++				
++				if (target.max_ports[i]) {
++				    if (((target.src_ports[i])&&(ntohs(flow->srcport)>ntohs(target.src_ports[i]))&&(ntohs(flow->srcport)<=ntohs(target.max_ports[i])))||
++				    ((target.dst_ports[i])&&(ntohs(flow->dstport)>ntohs(target.dst_ports[i]))&&(ntohs(flow->dstport)<=ntohs(target.max_ports[i])))) {
++					res=1;
++					break;
++				    }
++				}
++
+ 			}
+ 			if(!res) return 0;
+ 		}
+diff -dPNur netams-3.2.3/src/policy.h netams-3.2.3-ranges/src/policy.h
+--- netams-3.2.3/src/policy.h	2005-01-17 15:13:21.000000000 +0100
++++ netams-3.2.3-ranges/src/policy.h	2005-07-25 23:30:40.000000000 +0200
+@@ -86,6 +86,8 @@
+ 	u_char  num_ports;
+ 	u_short src_ports[PC_MAX_PORTS];
+ 	u_short dst_ports[PC_MAX_PORTS];
++
++	u_short max_ports[PC_MAX_PORTS];
+ 	
+ 	//PC_IP_TOS
+ 	u_char ip_tos;

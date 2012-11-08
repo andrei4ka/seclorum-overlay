@@ -1,0 +1,15 @@
+--- doc/netams.8.orig	2008-01-03 15:44:53 +0300
++++ doc/netams.8	2008-12-06 21:33:55 +0300
+@@ -87,10 +87,10 @@ will terminate the program safely.
+ 
+ .SH FILES
+ .TP
+-.B /etc/netams.conf or /usr/local/etc/netams.conf
++.B /etc/netams/netams.conf
+ Main configuration file.
+ .TP
+-.B /etc/init.d/netams-startup.sh or /usr/local/etc/rc.d/netams-startup.sh
++.B /etc/rc.d/init.d/netams
+ Startup script.
+ .TP
+ .B /var/log/netams.log

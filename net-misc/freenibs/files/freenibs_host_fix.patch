@@ -1,0 +1,37 @@
+diff -Nru freeradius-1.1.6.orig/src/modules/rlm_nibs/configure freeradius-1.1.6/src/modules/rlm_nibs/configure
+--- freeradius-1.1.6.orig/src/modules/rlm_nibs/configure	2003-09-21 20:53:12.000000000 +0400
++++ freeradius-1.1.6/src/modules/rlm_nibs/configure	2007-08-20 12:50:44.000000000 +0400
+@@ -189,9 +189,9 @@
+     exit 0 ;;
+ 
+   -host | --host | --hos | --ho)
+-    ac_prev=host ;;
++    ac_prev=host_alias ;;
+   -host=* | --host=* | --hos=* | --ho=*)
+-    host="$ac_optarg" ;;
++    host_alias=$ac_optarg ;;
+ 
+   -includedir | --includedir | --includedi | --included | --include \
+   | --includ | --inclu | --incl | --inc)
+@@ -382,15 +382,14 @@
+     ;;
+ 
+   *)
+-    if test -n "`echo $ac_option| sed 's/[-a-z0-9.]//g'`"; then
+-      echo "configure: warning: $ac_option: invalid host type" 1>&2
+-    fi
+-    if test "x$nonopt" != xNONE; then
+-      { echo "configure: error: can only configure for one host and one target at a time" 1>&2; exit 1; }
+-    fi
+-    nonopt="$ac_option"
++    # FIXME: should be removed in autoconf 3.0.
++    echo "$as_me: WARNING: you should use --build, --host, --target" >&2
++    expr "x$ac_option" : ".*[^-._$as_cr_alnum]" >/dev/null &&
++      echo "$as_me: WARNING: invalid host type: $ac_option" >&2
++    : ${build_alias=$ac_option} ${host_alias=$ac_option} ${target_alias=$ac_option}
+     ;;
+ 
++
+   esac
+ done
+ 

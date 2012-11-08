@@ -1,0 +1,14 @@
+--- src/unpaper.c	2009/01/13 16:42:09	2
++++ src/unpaper.c	2009/01/13 16:52:18	3
+@@ -1012,9 +1012,9 @@
+         }
+         for (i = 1; i < cnt; i++) {        
+             if (s[i] != NULL) {
+-                sprintf(buf, "%s, %s", buf, s[i]);
++                sprintf(buf + strlen(buf), ", %s", s[i]);
+             } else {
+-                sprintf(buf, "%s, %s", buf, BLANK_TEXT);
++                sprintf(buf + strlen(buf), ", %s", BLANK_TEXT);
+             }
+         }
+     } else {

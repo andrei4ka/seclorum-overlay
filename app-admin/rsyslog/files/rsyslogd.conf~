@@ -1,0 +1,7 @@
+# /etc/conf.d/rsyslogd
+#
+# Custom options to pass to rlocated
+#   For remote UDP logging use SYSLOGD_OPTIONS="-r0"
+#   For relaying add "-h" to SYSLOGD_OPTIONS
+
+SYSLOGD_OPTIONS="-r0 -h"

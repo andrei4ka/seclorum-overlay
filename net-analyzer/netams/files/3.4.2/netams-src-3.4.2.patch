@@ -1,0 +1,12 @@
+diff -Naur netams-3.4.0rc2.orig/src/netamsctl.c netams-3.4.0rc2/src/netamsctl.c
+--- netams-3.4.0rc2.orig/src/netamsctl.c	2007-05-13 17:30:41 +0400
++++ netams-3.4.0rc2/src/netamsctl.c	2007-06-07 02:34:50 +0400
+@@ -51,8 +51,6 @@
+ 		sprintf(str, "%s/.netamsctl.rc", homedir);
+ 		RCFILE=fopen(str, "rt");
+ 	}
+-	if (!RCFILE) RCFILE=fopen(".netamsctl.rc", "rt");
+-	if (!RCFILE) RCFILE=fopen("/usr/local/etc/.netamsctl.rc", "rt");
+ 	if (!RCFILE) RCFILE=fopen("/etc/.netamsctl.rc", "rt");
+ 	if (!RCFILE) { printf("unable to open .rc file\n"); exit(-1); }
+ 	}

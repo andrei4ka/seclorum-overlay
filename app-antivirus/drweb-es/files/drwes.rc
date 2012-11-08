@@ -1,0 +1,20 @@
+#!/sbin/runscript
+# DrWebES ebuild by Mark Silinio <silinio[at]fromru.com>
+
+#opts="${opts} reload"
+
+depend() {
+	need net
+	use postgresql
+}
+
+start() {
+	ebegin "Starting DrWeb Enterprise Suite daemon"
+	/bin/su - drwcs -c "/opt/drweb-es/bin/drwcsd -etc=/opt/drweb-es/etc -var-root=/opt/drweb-es/var -verbosity=INFO -log=/opt/drweb-es/var/server.log -daemon"
+	eend
+}
+stop() {
+	ebegin "Stopping DrWeb Enterprise Suite daemon"
+	killall drwcsd-unsafe
+	eend
+}

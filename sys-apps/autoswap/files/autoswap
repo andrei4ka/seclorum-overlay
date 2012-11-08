@@ -1,0 +1,48 @@
+#!/sbin/runscript
+# Copyright 1999-2006 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+# 
+# Autodetect swap partition
+# author: Mathias Laurin <mathias_laurin@users.sourceforge.net>
+# from the script found at http://gentoo-wiki.com/TIP_automount_swap
+# left by an anonymous contributor.
+#
+# 2006-12-26, v.0.2.0
+
+depend() {
+	after fsck
+}
+
+do_swap() {
+	local CMD="$1"
+	local DEVLIST
+	local DEV
+
+	DEVLIST="$(ls /dev/[h-s]d[a-z][0-9]*)"
+	# LVM2 support
+	[ -c /dev/mapper/control ] && DEVLIST="$DEVLIST $(ls /dev/mapper/*)"
+
+	for DEV in $DEVLIST
+	do
+		FS="$(file -sL "$DEV"| cut -d' ' -f3)"
+		if [ "$FS" = "swap" ]
+		then
+			einfo "    $DEV"
+			$CMD "$DEV"
+		fi
+	done
+	return $?
+}
+
+start() {
+	ebegin "Activating swap devices"
+	do_swap /sbin/swapon
+	eend $?
+}
+
+stop() {
+	ebegin "Deactivating swap devices"
+	do_swap /sbin/swapoff
+	eend $?
+}

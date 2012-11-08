@@ -1,0 +1,13 @@
+--- src/memory.c.orig	2008-12-07 14:57:46 +0300
++++ src/memory.c	2008-12-07 14:57:23 +0300
+@@ -35,8 +35,8 @@ static mem_unit TMP;
+ //mem hash
+ LHASH *mem_hash;
+ 
+-unsigned MEM_hash(mem_unit *m) {
+-	return (unsigned)m->ptr;
++unsigned long MEM_hash(mem_unit *m) {
++	return (unsigned long)m->ptr;
+ }
+ int MEM_cmp(mem_unit *m1, mem_unit *m2) {
+ 	return (m1->ptr == m2->ptr)?0:1;

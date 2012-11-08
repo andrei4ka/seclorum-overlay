@@ -1,0 +1,22 @@
+diff -urN samba-4.0.0beta3.orig/source4/heimdal/cf/make-proto.pl samba-4.0.0beta3/source4/heimdal/cf/make-proto.pl
+--- samba-4.0.0beta3.orig/source4/heimdal/cf/make-proto.pl	2012-06-29 01:57:55.000000000 +0200
++++ samba-4.0.0beta3/source4/heimdal/cf/make-proto.pl	2012-07-03 17:58:57.327572166 +0200
+@@ -1,8 +1,7 @@
+ # Make prototypes from .c files
+ # $Id$
+ 
+-##use Getopt::Std;
+-require 'getopts.pl';
++use Getopt::Std;
+ 
+ my $comment = 0;
+ my $if_0 = 0;
+@@ -13,7 +12,7 @@
+ my $private_func_re = "^_";
+ my %depfunction = ();
+ 
+-Getopts('x:m:o:p:dqE:R:P:') || die "foo";
++getopts('x:m:o:p:dqE:R:P:') || die "foo";
+ 
+ if($opt_d) {
+     $debug = 1;

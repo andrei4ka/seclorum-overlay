@@ -1,0 +1,4 @@
+#!/bin/sh
+export LIBGL_DRIVERS_DIR=/usr/X11R6/lib32/modules/dri
+export LD_LIBRARY_PATH=/usr/lib32:${LD_LIBRARY_PATH}
+${MAYA_LOCATION}/bin/maya

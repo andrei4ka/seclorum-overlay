@@ -1,0 +1,18 @@
+[Desktop Entry]
+Comment=
+Comment[en_US]=
+Exec[$e]=env WINEPREFIX="$${HOME}/.wine" wine "Z:\\opt\\winsoft\\ammyy-admin\\ammyy-admin2.exe"
+GenericName=
+GenericName[en_US]=
+Icon=/opt/winsoft/ammyy-admin/ammyy-admin2.png
+MimeType=
+Name=Ammyy_Admin_2
+Path[$e]=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-DCOP-ServiceType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+Categories=Application;Network;

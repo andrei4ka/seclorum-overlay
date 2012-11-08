@@ -1,0 +1,13 @@
+--- ./autogen.sh	2007-01-11 17:01:21.000000000 +0300
++++ ./autogen.sh.new	2007-12-26 09:14:53.000000000 +0300
+@@ -117,10 +117,3 @@
+ 
+ #conf_flags="--enable-maintainer-mode --enable-compile-warnings" #--enable-iso-c
+ 
+-if test x$NOCONFIGURE = x; then
+-  echo Running $srcdir/configure $conf_flags "$@" ...
+-  $srcdir/configure $conf_flags "$@" \
+-  && echo Now type \`make\' to compile $PKG_NAME
+-else
+-  echo Skipping configure process.
+-fi

@@ -1,0 +1,23 @@
+diff -U2 madwifi-hal-0.10.5.6-r4126-20100324-old/ath/if_ath.c madwifi-hal-0.10.5.6-r4126-20100324/ath/if_ath.c
+--- madwifi-hal-0.10.5.6-r4126-20100324-old/ath/if_ath.c	2010-01-18 20:21:22.000000000 +0600
++++ madwifi-hal-0.10.5.6-r4126-20100324/ath/if_ath.c	2010-08-04 04:18:38.000000000 +0700
+@@ -4258,5 +4258,5 @@
+ 	struct ieee80211com *ic = &sc->sc_ic;
+ 	struct ieee80211vap *vap;
+-	struct dev_mc_list *mc;
++	struct netdev_hw_addr *ha;
+ 	u_int32_t val;
+ 	u_int8_t pos;
+@@ -4266,9 +4266,9 @@
+ 	TAILQ_FOREACH(vap, &ic->ic_vaps, iv_next) {
+ 		struct net_device *dev = vap->iv_dev;
+-		for (mc = dev->mc_list; mc; mc = mc->next) {
++		netdev_for_each_mc_addr(ha, dev) {
+ 			/* calculate XOR of eight 6-bit values */
+-			val = LE_READ_4(mc->dmi_addr + 0);
++			val = LE_READ_4(ha->addr + 0);
+ 			pos = (val >> 18) ^ (val >> 12) ^ (val >> 6) ^ val;
+-			val = LE_READ_4(mc->dmi_addr + 3);
++			val = LE_READ_4(ha->addr + 3);
+ 			pos ^= (val >> 18) ^ (val >> 12) ^ (val >> 6) ^ val;
+ 			pos &= 0x3f;

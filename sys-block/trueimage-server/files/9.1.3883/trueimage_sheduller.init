@@ -1,0 +1,18 @@
+#!/sbin/runscript
+# Copyright 1999-2009 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: 
+
+ATILS_DIR=/usr/lib/Acronis
+
+start() {
+	ebegin "Running Acronis True Image startup tasks..."
+	start-stop-daemon --start --exec $ATILS_DIR/Schedule/schedwrapper-bin -- -m startup
+	eend $?
+}
+
+stop() {
+	ebegin "Running Acronis True Image shutdown tasks..."
+	start-stop-daemon --stop --quiet --exec ${ATILS_DIR}/Schedule/schedwrapper-bin -- -m shutdown
+	eend $?
+}

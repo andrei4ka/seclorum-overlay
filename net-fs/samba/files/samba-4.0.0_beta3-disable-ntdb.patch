@@ -1,0 +1,61 @@
+commit d3110bf0d1c4563db076eb104297f5956c5b37d7
+Author: Rusty Russell <rusty@rustcorp.com.au>
+Date:   Wed Jul 4 13:51:07 2012 +0930
+
+    ntdb: make --disable-ntdb work properly.
+    
+    As per bug #9024, make --disable-ntdb work again.
+    
+    Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+
+diff --git a/lib/dbwrap/dbwrap_local_open.c b/lib/dbwrap/dbwrap_local_open.c
+index bb0df48..fb5f17e 100644
+--- a/lib/dbwrap/dbwrap_local_open.c
++++ b/lib/dbwrap/dbwrap_local_open.c
+@@ -22,7 +22,9 @@
+ #include "dbwrap/dbwrap.h"
+ #include "dbwrap/dbwrap_tdb.h"
+ #include "tdb.h"
++#ifndef DISABLE_NTDB
+ #include "lib/util/util_ntdb.h"
++#endif
+ #include "lib/param/param.h"
+ #include "system/filesys.h"
+ #include "ccan/str/str.h"
+diff --git a/lib/util/wscript_build b/lib/util/wscript_build
+index e601ecd..340cf12 100755
+--- a/lib/util/wscript_build
++++ b/lib/util/wscript_build
+@@ -45,12 +45,13 @@ bld.SAMBA_LIBRARY('util_tdb',
+ 	private_library=True
+ 	)
+ 
+-bld.SAMBA_LIBRARY('util_ntdb',
+-	source='util_ntdb.c',
+-	local_include=False,
+-	public_deps='ntdb talloc samba-util samba-hostconfig',
+-	private_library=True
+-	)
++if not bld.env.disable_ntdb:
++    bld.SAMBA_LIBRARY('util_ntdb',
++		source='util_ntdb.c',
++		local_include=False,
++		public_deps='ntdb talloc samba-util samba-hostconfig',
++		private_library=True
++		)
+ 
+ bld.SAMBA_LIBRARY('tevent-util',
+ 	source='tevent_unix.c tevent_ntstatus.c tevent_werror.c',
+diff --git a/wscript b/wscript
+index 1238eb6..727374d 100755
+--- a/wscript
++++ b/wscript
+@@ -132,6 +132,8 @@ def configure(conf):
+     conf.env.disable_ntdb = getattr(Options.options, 'disable_ntdb', False)
+     if not Options.options.disable_ntdb:
+         conf.RECURSE('lib/ntdb')
++    else:
++        conf.DEFINE('DISABLE_NTDB', 1)
+     conf.RECURSE('lib/zlib')
+     conf.RECURSE('lib/util/charset')
+     conf.RECURSE('source4/auth')

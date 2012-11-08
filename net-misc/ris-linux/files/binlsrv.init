@@ -1,0 +1,20 @@
+#!/sbin/runscript
+# Copyright 1999-2009 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: 
+
+PIDFILE=/var/run/${SVCNAME}.pid
+
+BINLSRV="/opt/ris-linux/binlsrv.py $RUN_OPTIONS"
+
+start() {
+	ebegin "Starting binlserv"
+	${BINLSRV}
+	eend $? "Failed to start binlserv"
+}
+
+stop() {
+	ebegin "Stopping binlserv"
+	start-stop-daemon --stop --quiet --pidfile "${PIDFILE}" --exec /opt/ris-linux/binlsrv.py
+	eend $?
+}

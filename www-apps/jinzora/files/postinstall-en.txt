@@ -1,0 +1,18 @@
+Browse to http://${VHOST_HOSTNAME}/${VHOST_APPDIR}
+
+You'll be taken through the web based installer. The web based installer is
+fully documented and should describe each option that you'll have along the
+way.
+
+Jinzora recommends the following settings for php (php.ini):
+     max_execution_time = 1200
+     memory_limit = 32M (or higher)
+     post_max_size = 32M (or higher)
+     file_uploads = 1 (on)
+     upload_max_filesize = 32M (or higher)
+
+Also note that you may need to edit ${MY_INSTALLDIR}/settings.php and change
+some default paths (/usr/bin rather than /usr/local/bin).
+
+sed -i "s|/usr/local/bin|/usr/bin|g" ${MY_INSTALLDIR}/settings.php
+should do the trick.

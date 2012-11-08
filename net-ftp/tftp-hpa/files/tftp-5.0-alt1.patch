@@ -1,0 +1,118 @@
+ tftp/main.c      |    8 +++++---
+ tftpd/tftpd.8.in |    3 +++
+ tftpd/tftpd.c    |   30 +++++++++++++++++++++++-------
+ 3 files changed, 31 insertions(+), 10 deletions(-)
+
+diff --git a/tftp/main.c b/tftp/main.c
+index 1b8a881..b157c26 100644
+--- a/tftp/main.c
++++ b/tftp/main.c
+@@ -188,7 +188,7 @@ char *xstrdup(const char *);
+ 
+ const char *program;
+ 
+-static inline void usage(int errcode)
++static void usage(int errcode)
+ {
+     fprintf(stderr,
+ #ifdef HAVE_IPV6
+@@ -802,8 +802,10 @@ static void command(void)
+             line = NULL;
+         }
+         line = readline(prompt);
+-        if (!line)
+-            exit(0);            /* EOF */
++        if (!line) {            /* EOF */
++            putchar('\n');
++            exit(0);
++        }
+ #else
+         fputs(prompt, stdout);
+         if (fgets(line, LBUFLEN, stdin) == 0) {
+diff --git a/tftpd/tftpd.8.in b/tftpd/tftpd.8.in
+index f42d874..a52db91 100644
+--- a/tftpd/tftpd.8.in
++++ b/tftpd/tftpd.8.in
+@@ -70,6 +70,9 @@ Similar to
+ but do not detach from the foreground process.  Implies
+ .BR \-\-listen .
+ .TP
++\fB\-\-pid\fP, \fB\-P\fP
++Create pid file /var/run/tftpd.pid in standalone (listen) mode.
++.TP
+ \fB\-\-address\fP \fI[address][:port]\fP, \fB\-a\fP \fI[address][:port]\fP
+ Specify a specific
+ .I address
+diff --git a/tftpd/tftpd.c b/tftpd/tftpd.c
+index b3b49ee..aeed09f 100644
+--- a/tftpd/tftpd.c
++++ b/tftpd/tftpd.c
+@@ -317,9 +317,12 @@ static struct option long_options[] = {
+     { "retransmit",  1, NULL, 'T' },
+     { "port-range",  1, NULL, 'R' },
+     { "map-file",    1, NULL, 'm' },
++    { "pid",         1, NULL, 'P' },
+     { NULL, 0, NULL, 0 }
+ };
+-static const char short_options[] = "46cspvVlLa:B:u:U:r:t:T:R:m:";
++static const char short_options[] = "46cspvVlLa:B:u:U:r:t:T:R:m:P";
++
++#define PIDFILE "/var/run/tftpd.pid"
+ 
+ int main(int argc, char **argv)
+ {
+@@ -339,6 +342,7 @@ int main(int argc, char **argv)
+     int fdmax = 0;
+     int standalone = 0;         /* Standalone (listen) mode */
+     int nodaemon = 0;           /* Do not detach process */
++    int pidfile = 0;            /* Create pid file */
+     char *address = NULL;       /* Address to listen to */
+     pid_t pid;
+     mode_t my_umask = 0;
+@@ -474,6 +478,9 @@ int main(int argc, char **argv)
+             printf("%s\n", TFTPD_CONFIG_STR);
+             exit(0);
+             break;
++        case 'P':
++            pidfile = 1;
++            break;
+         default:
+             syslog(LOG_ERR, "Unknown option: '%c'", optopt);
+             break;
+@@ -523,14 +530,15 @@ int main(int argc, char **argv)
+             if (fd4 < 0) {
+                 syslog(LOG_ERR, "cannot open IPv4 socket: %m");
+                 exit(EX_OSERR);
+-            }
++            } else {
+ #ifndef __CYGWIN__
+-            set_socket_nonblock(fd4, 1);
++                set_socket_nonblock(fd4, 1);
+ #endif
+-            memset(&bindaddr4, 0, sizeof bindaddr4);
+-            bindaddr4.sin_family = AF_INET;
+-            bindaddr4.sin_addr.s_addr = INADDR_ANY;
+-            bindaddr4.sin_port = htons(IPPORT_TFTP);
++                memset(&bindaddr4, 0, sizeof bindaddr4);
++                bindaddr4.sin_family = AF_INET;
++                bindaddr4.sin_addr.s_addr = INADDR_ANY;
++                bindaddr4.sin_port = htons(IPPORT_TFTP);
++            }
+ #ifdef HAVE_IPV6
+         }
+         if (ai_fam != AF_INET) {
+@@ -700,6 +708,14 @@ int main(int argc, char **argv)
+         if (!nodaemon && daemon(secure, 0) < 0) {
+             syslog(LOG_ERR, "cannot daemonize: %m");
+             exit(EX_OSERR);
++#ifndef __CYGWIN__
++        } else if (pidfile) {
++            FILE* pidf = fopen(PIDFILE, "w");
++            if(pidf) {
++                fprintf(pidf, "%u\n", (unsigned int)getpid());
++                fclose(pidf);
++            }
++#endif
+         }
+         if (fd6 > fd4)
+             fdmax = fd6;
