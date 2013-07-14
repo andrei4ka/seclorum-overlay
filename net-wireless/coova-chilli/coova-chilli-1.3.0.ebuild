@@ -4,7 +4,7 @@
 
 EAPI=4
 
-inherit eutils autotools
+inherit eutils autotools base linux-mod flag-o-matic toolchain-funcs
 
 MY_PN="CoovaChilli"
 DESCRIPTION="CoovaChilli is an open-source software access controller, based on
@@ -15,8 +15,6 @@ SRC_URI="http://ap.coova.org/chilli/${P}.tar.gz"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64"
-
-IUSE="ipv6 ssl matrixssl nfcoova json rtmon netnat pcap curl mmap poll ipc-msg nfqueue miniportal chillixml leakybucket +proxyvsa chilliradsec +chilliproxy"
 
 IUSE="curl debug matrixssl mmap nfcoova nfqueue pcap ssl"
 
@@ -39,6 +37,7 @@ src_prepare() {
 
 
 src_configure() {
+	unset ARCH
 	local myconf
 	local sslconf
 
@@ -72,7 +71,6 @@ src_configure() {
 		--enable-chilliredir \
 		--enable-redirinject \
 		--enable-chilliscript \
-		--enable-bonjour \
 		--enable-netbios \
 		--enable-ieee8023 \
 		--enable-ewtapi \
@@ -81,11 +79,13 @@ src_configure() {
 		--enable-eapol \
 		--enable-miniportal \
 		--enable-ewtapi \
-		--enable-libjson \
+		--disable-libjson \
 		--enable-ssdp \
 		--enable-layer3 \
 		--with-poll \
 		--with-lookup3 \
+		--with-nfcoova \
+		--with-nfqueue \
 		$(use_enable debug debug2) \
 		$(use_with mmap ) \
 		$(use_with nfcoova ) \
