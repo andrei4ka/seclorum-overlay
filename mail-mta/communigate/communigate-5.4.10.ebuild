@@ -76,8 +76,11 @@ src_install() {
 	fi
 
 	if use mta_system ; then
-		dosym ${APPLICATION}/mail /usr/bin/mail
 		dosym ${APPLICATION}/sendmail /usr/sbin/sendmail
+	fi
+	
+	if use mail_system ; then
+		dosym ${APPLICATION}/mail /usr/bin/mail
 	fi
 	
 	newinitd ${S}/communigate.init communigate
