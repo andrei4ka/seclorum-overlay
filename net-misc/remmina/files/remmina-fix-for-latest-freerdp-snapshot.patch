@@ -1,0 +1,11 @@
+--- a/remmina-plugins/rdp/rdp_plugin.c
++++ b/remmina-plugins/rdp/rdp_plugin.c
+@@ -826,7 +826,7 @@
+ 	instance->VerifyChangedCertificate = remmina_rdp_verify_changed_certificate;
+ 	instance->ReceiveChannelData = remmina_rdp_receive_channel_data;
+ 
+-	instance->ContextSize = sizeof(rfContext);
++	instance->context_size = sizeof(rfContext);
+ 	freerdp_context_new(instance);
+ 	rfi = (rfContext*) instance->context;
+ 
